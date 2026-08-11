@@ -9,14 +9,22 @@ import {
   SolutionItem,
   ClientLogoItem,
   getImageUrl,
+  getHero,
+  HeroContent,
+  getSiteSettings,
+  SiteSettings
 } from '../api/client';
 
 export const HomePage: React.FC = () => {
+  const [hero, setHero] = useState<HeroContent | null>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [stats, setStats] = useState<StatItem[]>([]);
   const [solutions, setSolutions] = useState<SolutionItem[]>([]);
   const [clientLogos, setClientLogos] = useState<ClientLogoItem[]>([]);
 
   useEffect(() => {
+    getHero().then(setHero);
+    getSiteSettings().then(setSettings);
     getStats().then(setStats);
     getSolutions().then(setSolutions);
     getClientLogos().then(setClientLogos);
@@ -37,7 +45,7 @@ export const HomePage: React.FC = () => {
             {/* Left Main Banner */}
             <div className="relative rounded-2xl overflow-hidden banner-zoom-container group h-[400px] lg:h-full">
               <img 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop" 
+                src={getImageUrl(hero?.hero_image_1) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop"} 
                 alt="Industrial Plant" 
                 className="absolute inset-0 w-full h-full object-cover" 
               />
@@ -45,10 +53,10 @@ export const HomePage: React.FC = () => {
               
               <div className="absolute inset-0 p-10 flex flex-col justify-end lg:justify-center z-10">
                 <span className="text-amberAccent font-bold tracking-widest uppercase text-xs mb-3 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                  Industrial Automation
+                  {hero?.badge || "Industrial Automation"}
                 </span>
                 <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                  Engineering <br /> Intelligence.
+                  {hero?.headline || "Engineering Intelligence."}
                 </h1>
                 <Link to="/solutions" className="inline-flex items-center gap-2 text-white font-bold uppercase text-sm border-b-2 border-amberAccent pb-1 w-fit hover:text-amberAccent transition-colors animate-fade-in-up" style={{animationDelay: '0.3s'}}>
                   Explore Solutions <ArrowRight className="w-4 h-4" />
@@ -62,7 +70,7 @@ export const HomePage: React.FC = () => {
               {/* Top Right Banner */}
               <div className="relative rounded-2xl overflow-hidden banner-zoom-container group h-[300px] lg:h-full">
                 <img 
-                  src="https://images.unsplash.com/photo-1580982327559-c1202864eb05?q=80&w=800&auto=format&fit=crop" 
+                  src={getImageUrl(hero?.hero_image_2) || "https://images.unsplash.com/photo-1580982327559-c1202864eb05?q=80&w=800&auto=format&fit=crop"} 
                   alt="Telemetry" 
                   className="absolute inset-0 w-full h-full object-cover" 
                 />
@@ -81,7 +89,7 @@ export const HomePage: React.FC = () => {
               {/* Bottom Right Banner */}
               <div className="relative rounded-2xl overflow-hidden banner-zoom-container group h-[300px] lg:h-full">
                 <img 
-                  src="https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800&auto=format&fit=crop" 
+                  src={getImageUrl(hero?.hero_image_3) || "https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800&auto=format&fit=crop"} 
                   alt="Pollution Control" 
                   className="absolute inset-0 w-full h-full object-cover" 
                 />
@@ -229,10 +237,10 @@ export const HomePage: React.FC = () => {
               Contact Us
             </Link>
             <a
-              href="tel:+919748636108"
+              href={`tel:${settings?.phone_primary?.replace(/\s+/g, '') || '+919748636108'}`}
               className="px-8 py-4 border border-gray-600 text-white font-bold uppercase text-sm tracking-wider rounded hover:border-white transition-colors flex items-center justify-center gap-2"
             >
-              <Phone className="w-4 h-4" /> Call +91 9748636108
+              <Phone className="w-4 h-4" /> Call {settings?.phone_primary || '+91 9748636108'}
             </a>
           </div>
         </div>

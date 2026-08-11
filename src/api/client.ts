@@ -9,10 +9,14 @@ export interface HeroContent {
   secondary_cta_text: string;
   secondary_cta_link: string;
   background_image_url?: string;
+  hero_image_1?: string;
+  hero_image_2?: string;
+  hero_image_3?: string;
   scada_plant_efficiency: number;
   scada_steam_flow: number;
   scada_fuel_consumption: number;
   scada_energy_saved_mwh: number;
+  is_published: boolean;
 }
 
 export interface StatItem {
@@ -119,14 +123,39 @@ export interface FaqItem {
   category: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
-export const HOST_BASE = API_BASE.replace(/\/api$/, '');
+export interface SiteSettings {
+  id: string;
+  phone_primary: string;
+  phone_secondary: string;
+  email: string;
+  address: string;
+  business_hours: string;
+  linkedin_url?: string;
+  brochure_pdf_url?: string;
+}
 
-export const getImageUrl = (url?: string) => {
-  if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  if (url.startsWith('/uploads/')) return `${HOST_BASE}${url}`;
-  return url;
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+export const getImageUrl = (path?: string) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  if (path.startsWith('/uploads')) {
+    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:3001';
+    return `${baseUrl}${path}`;
+  }
+  return path;
+};
+
+export const getHero = async (): Promise<HeroContent> => {
+  const res = await fetch(`${API_BASE}/content/hero`);
+  if (!res.ok) throw new Error('Failed to fetch hero content');
+  return res.json();
+};
+
+export const getSiteSettings = async (): Promise<SiteSettings> => {
+  const res = await fetch(`${API_BASE}/content/settings`);
+  if (!res.ok) throw new Error('Failed to fetch site settings');
+  return res.json();
 };
 
 async function fetchJson<T>(endpoint: string, fallback: T): Promise<T> {
@@ -155,6 +184,7 @@ export const getHeroContent = () =>
     scada_steam_flow: 12.45,
     scada_fuel_consumption: 850,
     scada_energy_saved_mwh: 1240,
+    is_published: true,
   });
 
 export const getStats = () =>
