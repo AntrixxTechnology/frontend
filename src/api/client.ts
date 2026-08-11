@@ -120,6 +120,14 @@ export interface FaqItem {
 }
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
+export const HOST_BASE = API_BASE.replace(/\/api$/, '');
+
+export const getImageUrl = (url?: string) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/uploads/')) return `${HOST_BASE}${url}`;
+  return url;
+};
 
 async function fetchJson<T>(endpoint: string, fallback: T): Promise<T> {
   try {

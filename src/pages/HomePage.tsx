@@ -8,6 +8,7 @@ import {
   StatItem,
   SolutionItem,
   ClientLogoItem,
+  getImageUrl,
 } from '../api/client';
 
 export const HomePage: React.FC = () => {
@@ -142,7 +143,7 @@ export const HomePage: React.FC = () => {
                 {/* Fallback pattern if no image */}
                 <div className="absolute inset-0 bg-inkBlack/5 group-hover:bg-inkBlack/0 transition-colors z-10"></div>
                 <img 
-                  src={sol.hero_image_url || `https://images.unsplash.com/photo-${1500000000000 + idx}?q=80&w=600&auto=format&fit=crop`}
+                  src={getImageUrl(sol.hero_image_url) || `https://images.unsplash.com/photo-${1500000000000 + idx}?q=80&w=600&auto=format&fit=crop`}
                   alt={sol.title}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {
@@ -197,7 +198,7 @@ export const HomePage: React.FC = () => {
               >
                 {client.logo_url ? (
                   <img
-                    src={client.logo_url}
+                    src={getImageUrl(client.logo_url)}
                     alt={client.name}
                     className="h-full w-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
                     loading="lazy"
