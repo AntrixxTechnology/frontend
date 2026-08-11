@@ -105,6 +105,19 @@ export interface ResourcePost {
   published_date: string;
 }
 
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  author: string;
+  featured_image_url?: string;
+  meta_title?: string;
+  meta_description?: string;
+  is_published: boolean;
+  created_at?: string;
+}
+
 export interface JobOpening {
   id: string;
   title: string;
@@ -215,3 +228,5 @@ export const getResources = () => fetchJson<ResourcePost[]>('/resources', []);
 export const getResourceBySlug = (slug: string) => fetchJson<ResourcePost | null>(`/resources/${slug}`, null);
 export const getJobOpenings = () => fetchJson<JobOpening[]>('/job-openings', []);
 export const getFaqs = () => fetchJson<FaqItem[]>('/faqs', []);
+export const getBlogs = () => fetchJson<BlogPost[]>('/blogs', []);
+export const getBlogBySlug = (slug: string) => fetchJson<BlogPost | null>(`/blogs/${slug}`, null);
