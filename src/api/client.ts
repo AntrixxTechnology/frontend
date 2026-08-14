@@ -147,13 +147,13 @@ export interface SiteSettings {
   brochure_pdf_url?: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://antrixx-backend.vercel.app/api';
 
 export const getImageUrl = (path?: string) => {
   if (!path) return '';
   if (path.startsWith('http')) return path;
   if (path.startsWith('/uploads')) {
-    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:3001';
+    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api(\/admin)?$/, '') : 'https://antrixx-backend.vercel.app';
     return `${baseUrl}${path}`;
   }
   return path;
