@@ -12,12 +12,13 @@ import {
   ChevronRight,
   Send,
 } from 'lucide-react';
-import { getSolutionBySlug, SolutionItem } from '../api/client';
+import { getSolutionBySlug, SolutionItem, API_BASE } from '../api/client';
 
 export const SolutionDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [solution, setSolution] = useState<SolutionItem | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'features' | 'specs'>('overview');
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ export const SolutionDetailPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

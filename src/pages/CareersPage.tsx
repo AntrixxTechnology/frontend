@@ -13,18 +13,17 @@ import {
   FileText,
   ChevronRight,
 } from 'lucide-react';
-import { getJobOpenings, JobOpening } from '../api/client';
+import { getJobOpenings, JobOpening, API_BASE } from '../api/client';
 
 export const CareersPage: React.FC = () => {
   const [jobs, setJobs] = useState<JobOpening[]>([]);
-  const [selectedJob, setSelectedJob] = useState<string>('');
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     applicant_name: '',
     email: '',
     phone: '',
-    role_title: '',
+    role_title: 'Boiler Automation & Controls Engineer',
     notes: '',
     resume_file_url: '',
   });
@@ -39,7 +38,6 @@ export const CareersPage: React.FC = () => {
   }, []);
 
   const handleApplyClick = (jobTitle: string) => {
-    setSelectedJob(jobTitle);
     setFormData((prev) => ({ ...prev, role_title: jobTitle }));
     const formElement = document.getElementById('application-form');
     if (formElement) {
@@ -50,7 +48,7 @@ export const CareersPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/careers/apply', {
+      const res = await fetch(`${API_BASE}/careers/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

@@ -147,7 +147,7 @@ export interface SiteSettings {
   brochure_pdf_url?: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://antrixx-backend.vercel.app/api';
+export const API_BASE = import.meta.env.VITE_API_URL || 'https://antrixx-backend.vercel.app/api';
 
 export const getImageUrl = (path?: string) => {
   if (!path) return '';
@@ -160,15 +160,18 @@ export const getImageUrl = (path?: string) => {
 };
 
 export const getHero = async (): Promise<HeroContent> => {
-  const res = await fetch(`${API_BASE}/content/hero`);
-  if (!res.ok) throw new Error('Failed to fetch hero content');
-  return res.json();
+  return getHeroContent();
 };
 
 export const getSiteSettings = async (): Promise<SiteSettings> => {
-  const res = await fetch(`${API_BASE}/content/settings`);
-  if (!res.ok) throw new Error('Failed to fetch site settings');
-  return res.json();
+  return fetchJson<SiteSettings>('/site-settings', {
+    id: 'settings-1',
+    phone_primary: '+91 98310 00000',
+    phone_secondary: '+91 33 2200 0000',
+    email: 'info@antrixxtechnology.com',
+    address: 'Kolkata, West Bengal, India',
+    business_hours: 'Mon - Sat: 9:00 AM - 7:00 PM',
+  });
 };
 
 async function fetchJson<T>(endpoint: string, fallback: T): Promise<T> {

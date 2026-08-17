@@ -12,6 +12,8 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
+import { API_BASE } from '../api/client';
+
 export const ContactPage: React.FC = () => {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,7 +32,7 @@ export const ContactPage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
