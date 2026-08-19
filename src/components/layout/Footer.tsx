@@ -4,42 +4,11 @@ import { Phone, Mail, MapPin, ArrowRight, Linkedin, Globe, ShieldCheck } from 'l
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#14141A] text-white pt-16 pb-8 border-t border-slate-800 font-sans">
+    <footer className="bg-[#14141A] text-white pt-12 pb-8 border-t border-slate-800 font-sans">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Top Newsletter / Quick Inquiry Bar */}
-        <div className="pb-12 border-b border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-6 space-y-2">
-            <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block">
-              STAY CONNECTED WITH ANTRIXX
-            </span>
-            <h3 className="font-display text-xl sm:text-2xl font-extrabold text-white">
-              Subscribe to Industrial Energy & Utility Insights
-            </h3>
-            <p className="text-xs text-slate-400">
-              Get technical case studies on boiler house optimization, ash handling, and SCADA remote monitoring.
-            </p>
-          </div>
-
-          <div className="lg:col-span-6">
-            <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-2 max-w-md ml-auto">
-              <input
-                type="email"
-                placeholder="Enter your corporate email address"
-                className="w-full px-4 py-3 rounded-md bg-slate-900 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amberAccent"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shrink-0 transition-colors"
-              >
-                SUBSCRIBE
-              </button>
-            </form>
-          </div>
-        </div>
-
         {/* Main 4-Column Footer Body */}
-        <div className="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="pb-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Col 1: Brand & Bio */}
           <div className="space-y-4 lg:col-span-1">
