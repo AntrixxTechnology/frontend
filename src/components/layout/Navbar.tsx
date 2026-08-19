@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Phone, ChevronDown, Menu, X, ArrowRight } from 'lucide-react';
+import { Phone, ChevronDown, Menu, X, ArrowRight, Activity, Flame, Wind, Layers, Truck, Cpu, Zap } from 'lucide-react';
+import { getSolutions, SolutionItem, getImageUrl } from '../../api/client';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [solutionsDropdownOpen, setSolutionsDropdownOpen] = useState(false);
+  const [solutionsList, setSolutionsList] = useState<SolutionItem[]>([]);
   const location = useLocation();
+
+  useEffect(() => {
+    getSolutions().then((data) => {
+      if (data && data.length > 0) setSolutionsList(data);
+    });
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,69 +71,64 @@ export const Navbar: React.FC = () => {
                 SOLUTIONS <ChevronDown className={`w-3.5 h-3.5 transition-transform ${solutionsDropdownOpen ? 'rotate-180 text-amberAccent' : ''}`} />
               </Link>
 
-              {/* Mega-menu panel (Clean Light Theme) */}
+              {/* Mega-menu panel (100% Dynamic with Exact Reference Look & Fonts) */}
               {solutionsDropdownOpen && (
                 <div className="absolute top-[100%] -left-48 pt-4 w-[820px] z-50">
                   <div className="bg-white rounded-xl shadow-cardHover border border-gray200 p-8 grid grid-cols-12 gap-8 animate-fade-in-up">
-                    {/* Col 1 */}
+                    
+                    {/* Dynamic Col 1: Automation Solutions */}
                     <div className="col-span-3 space-y-4">
                       <p className="text-[11px] font-display font-bold uppercase tracking-widest text-amberAccent pb-2 border-b border-gray200">
                         Automation Solutions
                       </p>
                       <div className="space-y-3">
-                        <Link to="/solutions/boiler-automation" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Boiler Automation & Draft Control
-                        </Link>
-                        <Link to="/solutions/utility-remote-monitoring" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Utility Remote Monitoring
-                        </Link>
-                        <Link to="/solutions/steam-fuel-tracker" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Steam Fuel Tracker System
-                        </Link>
-                        <Link to="/solutions/steam-engineering-automation" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Steam Engineering Automation
-                        </Link>
+                        {solutionsList.slice(0, Math.max(2, Math.ceil(solutionsList.length / 3))).map((sol) => (
+                          <Link
+                            key={sol.id}
+                            to={`/solutions/${sol.slug}`}
+                            className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all truncate"
+                          >
+                            {sol.title}
+                          </Link>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Col 2 */}
+                    {/* Dynamic Col 2: Environment & Spares */}
                     <div className="col-span-3 space-y-4">
                       <p className="text-[11px] font-display font-bold uppercase tracking-widest text-amberAccent pb-2 border-b border-gray200">
                         Environment & Spares
                       </p>
                       <div className="space-y-3">
-                        <Link to="/solutions/pollution-control-equipment" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Pollution Control Equipment
-                        </Link>
-                        <Link to="/solutions/ash-handling-system" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Ash Handling Systems
-                        </Link>
-                        <Link to="/solutions/fuel-handling-system" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Fuel Handling Systems
-                        </Link>
-                        <Link to="/solutions/boiler-bag-filter-water-treatment-spares" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Boiler & Bag Filter Spares
-                        </Link>
+                        {solutionsList.slice(Math.ceil(solutionsList.length / 3), Math.ceil((2 * solutionsList.length) / 3)).map((sol) => (
+                          <Link
+                            key={sol.id}
+                            to={`/solutions/${sol.slug}`}
+                            className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all truncate"
+                          >
+                            {sol.title}
+                          </Link>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Col 3 */}
+                    {/* Dynamic Col 3: Energy & Consulting */}
                     <div className="col-span-3 space-y-4">
                       <p className="text-[11px] font-display font-bold uppercase tracking-widest text-amberAccent pb-2 border-b border-gray200">
                         Energy & Consulting
                       </p>
                       <div className="space-y-3">
-                        <Link to="/solutions/steam-energy-loss-diagnosis" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Steam & Energy Loss Diagnosis
-                        </Link>
-                        <Link to="/solutions/retrofitting-boiler-thermic-fluid-heater" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Retrofitting Services
-                        </Link>
-                        <Link to="/solutions/project-consultation-management" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
+                        {solutionsList.slice(Math.ceil((2 * solutionsList.length) / 3)).map((sol) => (
+                          <Link
+                            key={sol.id}
+                            to={`/solutions/${sol.slug}`}
+                            className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all truncate"
+                          >
+                            {sol.title}
+                          </Link>
+                        ))}
+                        <Link to="/contact" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
                           Turnkey Consultation
-                        </Link>
-                        <Link to="/solutions/heat-pump-chilling-bop-management" className="block text-xs font-sans text-gray500 hover:text-amberAccent hover:translate-x-1 transition-all">
-                          Heat Pump & Chilling BOP
                         </Link>
                       </div>
                     </div>

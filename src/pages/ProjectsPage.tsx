@@ -10,7 +10,7 @@ import {
   PhoneCall,
   Filter,
 } from 'lucide-react';
-import { getProjects, getClientLogos, ProjectItem, ClientLogoItem } from '../api/client';
+import { getProjects, getClientLogos, ProjectItem, ClientLogoItem, getImageUrl } from '../api/client';
 
 export const ProjectsPage: React.FC = () => {
   const [projects, setProjects] = useState<ProjectItem[]>([]);
@@ -91,7 +91,7 @@ export const ProjectsPage: React.FC = () => {
                 {/* Image Header */}
                 <div className="relative h-56 overflow-hidden bg-gray-100">
                   <img
-                    src={proj.image_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop'}
+                    src={getImageUrl(proj.image_url) || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop'}
                     alt={proj.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {

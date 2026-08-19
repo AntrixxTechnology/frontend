@@ -5,7 +5,7 @@ import {
   PhoneCall,
   SlidersHorizontal,
 } from 'lucide-react';
-import { getSolutions, SolutionItem } from '../api/client';
+import { getSolutions, SolutionItem, getImageUrl } from '../api/client';
 
 export const SolutionsHubPage: React.FC = () => {
   const [solutions, setSolutions] = useState<SolutionItem[]>([]);
@@ -86,7 +86,7 @@ export const SolutionsHubPage: React.FC = () => {
 
           {/* Image-Heavy Solution Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSolutions.map((sol, idx) => (
+            {filteredSolutions.map((sol) => (
               <Link
                 key={sol.id}
                 to={`/solutions/${sol.slug}`}
@@ -94,7 +94,7 @@ export const SolutionsHubPage: React.FC = () => {
               >
                 <div className="absolute inset-0 bg-inkBlack/5 group-hover:bg-inkBlack/0 transition-colors z-10"></div>
                 <img 
-                  src={`https://images.unsplash.com/photo-${1500000000000 + idx}?q=80&w=600&auto=format&fit=crop`}
+                  src={getImageUrl(sol.hero_image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop"}
                   alt={sol.title}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {

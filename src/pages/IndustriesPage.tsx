@@ -13,7 +13,7 @@ import {
   PhoneCall,
   Flame,
 } from 'lucide-react';
-import { getIndustries, IndustryItem } from '../api/client';
+import { getIndustries, IndustryItem, getImageUrl } from '../api/client';
 
 function renderIndustryIcon(iconName: string) {
   const props = { className: 'w-6 h-6 text-amberAccent' };
@@ -76,7 +76,7 @@ export const IndustriesPage: React.FC = () => {
                 {/* Image & Icon Header */}
                 <div className="relative h-48 overflow-hidden bg-gray-100">
                   <img
-                    src={ind.image_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop'}
+                    src={getImageUrl(ind.image_url) || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop'}
                     alt={ind.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

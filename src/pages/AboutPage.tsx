@@ -13,7 +13,7 @@ import {
   Clock,
   Factory,
 } from 'lucide-react';
-import { getAbout, getTeam, AboutContent, TeamMember } from '../api/client';
+import { getAbout, getTeam, AboutContent, TeamMember, getImageUrl } from '../api/client';
 
 export const AboutPage: React.FC = () => {
   const [about, setAbout] = useState<AboutContent | null>(null);
@@ -30,7 +30,7 @@ export const AboutPage: React.FC = () => {
       {/* 1. Header Banner */}
       <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 overflow-hidden banner-zoom-container bg-inkBlack group">
         <img 
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop" 
+          src={getImageUrl(about?.hero_image_url) || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop"} 
           alt="About Us Banner" 
           className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
@@ -80,7 +80,7 @@ export const AboutPage: React.FC = () => {
             <div className="lg:col-span-6">
               <div className="rounded-2xl overflow-hidden border border-gray200 shadow-cardHover">
                 <img
-                  src={about?.hero_image_url || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop'}
+                  src={getImageUrl(about?.hero_image_url) || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop'}
                   alt="Antrixx Thermal Engineers"
                   className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-500"
                 />
@@ -98,30 +98,26 @@ export const AboutPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Mission Card */}
-            <div className="p-8 rounded-2xl bg-white border border-gray200 shadow-cardLight space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-amberAccent/10 text-amberAccent border border-amberAccent/20 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-8 border border-gray200 shadow-sm space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-amberAccent/10 text-amberAccent flex items-center justify-center">
                 <Target className="w-6 h-6" />
               </div>
-              <h3 className="font-display text-2xl font-extrabold text-inkBlack">
-                Our Mission
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+              <h3 className="font-display text-2xl font-extrabold text-inkBlack">Our Mission</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 {about?.mission ||
-                  'To transform industrial utility operations through smart automation, rigorous energy loss diagnostics, and sustainable balance-of-plant engineering that minimizes fuel costs and carbon footprint.'}
+                  'To transform industrial thermal and utility house management by delivering smart automation, precision instrumentation, and turnkey engineering solutions that minimize fuel waste, maximize efficiency, and ensure environmental compliance.'}
               </p>
             </div>
 
             {/* Vision Card */}
-            <div className="p-8 rounded-2xl bg-white border border-gray200 shadow-cardLight space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-amberAccent/10 text-amberAccent border border-amberAccent/20 flex items-center justify-center">
+            <div className="bg-white rounded-2xl p-8 border border-gray200 shadow-sm space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-amberAccent/10 text-amberAccent flex items-center justify-center">
                 <Eye className="w-6 h-6" />
               </div>
-              <h3 className="font-display text-2xl font-extrabold text-inkBlack">
-                Our Vision
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+              <h3 className="font-display text-2xl font-extrabold text-inkBlack">Our Vision</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 {about?.vision ||
-                  'To be the most trusted industrial thermal and utility optimization engineering partner in South Asia, recognized for zero-downtime solutions and data-backed operational excellence.'}
+                  'To be South Asia’s most trusted engineering partner for boiler house optimization, energy loss diagnostics, and sustainable industrial utilities.'}
               </p>
             </div>
 
@@ -129,24 +125,15 @@ export const AboutPage: React.FC = () => {
 
           {/* Core Values */}
           {about?.values && about.values.length > 0 && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block">
-                  GUIDING PRINCIPLES
-                </span>
-                <h3 className="font-display text-2xl font-extrabold text-inkBlack mt-1">
-                  Our Core Pillars of Excellence
-                </h3>
-              </div>
-
+            <div className="space-y-6 pt-4">
+              <h3 className="font-display text-xl font-bold text-inkBlack text-center">
+                Our Guiding Engineering Principles
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {about.values.map((val, idx) => (
-                  <div key={idx} className="p-6 rounded-xl bg-white border border-gray200 shadow-sm space-y-2">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-5 h-5 text-amberAccent shrink-0" />
-                      <h4 className="font-display text-sm font-bold text-inkBlack">
-                        Pillar 0{idx + 1}
-                      </h4>
+                  <div key={idx} className="p-6 rounded-2xl bg-white border border-gray200 shadow-sm space-y-3">
+                    <div className="w-10 h-10 rounded-xl bg-amberAccent/10 text-amberAccent flex items-center justify-center font-bold font-display text-sm">
+                      0{idx + 1}
                     </div>
                     <p className="text-xs text-gray-600 leading-relaxed font-medium">
                       {val}
@@ -183,6 +170,45 @@ export const AboutPage: React.FC = () => {
         </div>
       </section>
 
+      {/* 5. Leadership & Team Section */}
+      {team && team.length > 0 && (
+        <section className="py-20 bg-offWhite border-t border-gray200">
+          <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block">
+                OUR LEADERSHIP & SPECIALISTS
+              </span>
+              <h2 className="font-display text-3xl font-extrabold text-inkBlack">
+                Meet the Engineering Minds
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {team.map((member) => (
+                <div key={member.id} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4 group">
+                  <div className="h-64 w-full rounded-xl overflow-hidden bg-offWhite relative">
+                    <img 
+                      src={getImageUrl(member.image_url) || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop"} 
+                      alt={member.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-extrabold text-base text-inkBlack">{member.name}</h3>
+                    <p className="text-amberAccent font-bold text-xs mt-0.5">{member.role}</p>
+                    {member.bio && <p className="text-xs text-gray-500 mt-2 leading-relaxed">{member.bio}</p>}
+                  </div>
+                  {member.linkedin_url && (
+                    <a href={member.linkedin_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-amberAccent pt-2">
+                      <Linkedin className="w-4 h-4 text-amberAccent" /> LinkedIn Profile
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 6. Consultation Banner */}
       <section className="py-16 bg-white">

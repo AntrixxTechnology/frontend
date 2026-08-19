@@ -78,9 +78,9 @@ export const HomePage: React.FC = () => {
                 
                 <div className="absolute inset-0 p-8 flex flex-col justify-end z-10 text-center items-center">
                   <h2 className="font-display text-3xl font-extrabold text-white mb-4">
-                    SCADA Telemetry
+                    {hero?.card_2_title || "SCADA Telemetry"}
                   </h2>
-                  <Link to="/solutions/utility-remote-monitoring" className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
+                  <Link to={hero?.card_2_link || "/solutions/utility-remote-monitoring"} className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
                     Shop System <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -97,9 +97,9 @@ export const HomePage: React.FC = () => {
                 
                 <div className="absolute inset-0 p-8 flex flex-col justify-end z-10 text-center items-center">
                   <h2 className="font-display text-3xl font-extrabold text-white mb-4">
-                    Environment Control
+                    {hero?.card_3_title || "Environment Control"}
                   </h2>
-                  <Link to="/solutions/pollution-control-equipment" className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
+                  <Link to={hero?.card_3_link || "/solutions/pollution-control-equipment"} className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
                     Explore Solutions <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
