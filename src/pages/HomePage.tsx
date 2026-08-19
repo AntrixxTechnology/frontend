@@ -16,15 +16,39 @@ import {
 } from '../api/client';
 
 export const HomePage: React.FC = () => {
-  const [hero, setHero] = useState<HeroContent | null>(null);
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [hero, setHero] = useState<HeroContent | null>(() => {
+    try {
+      const cached = localStorage.getItem('antrixx_hero_cache');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [settings, setSettings] = useState<SiteSettings | null>(() => {
+    try {
+      const cached = localStorage.getItem('antrixx_settings_cache');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
   const [stats, setStats] = useState<StatItem[]>([]);
   const [solutions, setSolutions] = useState<SolutionItem[]>([]);
   const [clientLogos, setClientLogos] = useState<ClientLogoItem[]>([]);
 
   useEffect(() => {
-    getHero().then(setHero);
-    getSiteSettings().then(setSettings);
+    getHero().then((data) => {
+      if (data) {
+        setHero(data);
+        try { localStorage.setItem('antrixx_hero_cache', JSON.stringify(data)); } catch {}
+      }
+    });
+    getSiteSettings().then((data) => {
+      if (data) {
+        setSettings(data);
+        try { localStorage.setItem('antrixx_settings_cache', JSON.stringify(data)); } catch {}
+      }
+    });
     getStats().then(setStats);
     getSolutions().then(setSolutions);
     getClientLogos().then(setClientLogos);
