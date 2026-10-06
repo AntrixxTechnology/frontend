@@ -23,30 +23,36 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+import { ModalProvider } from './context/ModalContext';
+import { ConsultationModal } from './components/common/ConsultationModal';
+
 export const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white text-inkBlack flex flex-col font-body">
-      <ScrollToTop />
-      <Navbar />
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/solutions" element={<SolutionsHubPage />} />
-          <Route path="/solutions/:slug" element={<SolutionDetailPage />} />
-          <Route path="/industries" element={<IndustriesPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/resources" element={<ResourcesPage />} />
-          <Route path="/resources/:slug" element={<ResourcesPage />} />
-          <Route path="/careers" element={<CareersPage />} />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/blogs" element={<BlogsPage />} />
-          <Route path="/blogs/:slug" element={<BlogDetailPage />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <ModalProvider>
+      <div className="min-h-screen bg-white text-inkBlack flex flex-col font-body">
+        <ScrollToTop />
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/solutions" element={<SolutionsHubPage />} />
+            <Route path="/solutions/:slug" element={<SolutionDetailPage />} />
+            <Route path="/industries" element={<IndustriesPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/resources" element={<ResourcesPage />} />
+            <Route path="/resources/:slug" element={<ResourcesPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/blogs" element={<BlogsPage />} />
+            <Route path="/blogs/:slug" element={<BlogDetailPage />} />
+          </Routes>
+        </main>
+        <Footer />
+        <ConsultationModal />
+      </div>
+    </ModalProvider>
   );
 };
 

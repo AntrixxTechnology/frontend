@@ -22,15 +22,22 @@ import {
   Flame,
 } from 'lucide-react';
 import { getSolutionBySlug, getSiteSettings, SolutionItem, SolutionSubProduct, SiteSettings, API_BASE, getImageUrl } from '../api/client';
+import { useModal } from '../context/ModalContext';
 
 export const SolutionDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { openConsultationModal } = useModal();
   const [solution, setSolution] = useState<SolutionItem | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedProductIndex, setSelectedProductIndex] = useState<number>(0);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Newsletter state & toast
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -39,6 +46,13 @@ export const SolutionDetailPage: React.FC = () => {
     company_name: '',
     message: '',
   });
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
+  };
 
   useEffect(() => {
     getSiteSettings().then(setSettings);
@@ -87,11 +101,34 @@ export const SolutionDetailPage: React.FC = () => {
       });
       if (res.ok) {
         setFormSubmitted(true);
+        showToast('Technical audit request received! Our engineers will review shortly.');
       }
     } catch (err) {
       console.error('Contact submission error:', err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    setNewsletterSubmitting(true);
+    try {
+      await fetch(`${API_BASE}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Newsletter Subscriber',
+          email: newsletterEmail,
+          phone: '+910000000000',
+          message: 'Newsletter subscription request for Industrial Utility Insights.',
+        }),
+      }).catch(() => {});
+      showToast('Subscription submitted successfully. Welcome to Industrial Insights!');
+      setNewsletterEmail('');
+    } finally {
+      setNewsletterSubmitting(false);
     }
   };
 
@@ -109,7 +146,7 @@ export const SolutionDetailPage: React.FC = () => {
       <div className="min-h-screen bg-white pt-40 pb-20 text-center space-y-4 font-body">
         <h2 className="font-display text-2xl font-extrabold text-inkBlack">Solution Not Found</h2>
         <p className="text-xs text-gray-500">The solution specified does not exist or has been removed.</p>
-        <Link to="/solutions" className="inline-block px-6 py-3 rounded-md bg-amberAccent text-white font-display font-bold text-xs uppercase">
+        <Link to="/solutions" className="inline-block px-6 py-3 rounded-md bg-amberAccent text-inkBlack font-display font-bold text-xs uppercase">
           Back to Solutions Hub
         </Link>
       </div>
@@ -158,26 +195,33 @@ export const SolutionDetailPage: React.FC = () => {
         'AMC & Annual Maintenance Contracts'
       ]);
 
-  // Sub products or fallback
-  const subProducts: SolutionSubProduct[] = solution.sub_products && solution.sub_products.length > 0
-    ? solution.sub_products
+  // Sub products: Parse defensively if string or array
+  const rawSubProducts = solution.sub_products;
+  const parsedSubProducts: SolutionSubProduct[] = typeof rawSubProducts === 'string'
+    ? (() => { try { return JSON.parse(rawSubProducts); } catch { return []; } })()
+    : (Array.isArray(rawSubProducts) ? rawSubProducts : []);
+
+  const subProducts: SolutionSubProduct[] = parsedSubProducts.length > 0
+    ? parsedSubProducts
     : [
         {
           id: 'sp-1',
           name: solution.title,
           image_url: solution.hero_image_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop',
           description: solution.short_description,
-          technical_specs: solution.technical_specs || {
-            'Application': 'Cement, Power, Steel, Food, Chemical, Mining & more',
-            'Gas Flow Capacity': '500 – 500,000 CMH',
-            'Collection Efficiency': '85% - 95% (for particulate size > 5 microns)',
-            'Inlet Dust Load': 'Up to 50 g/Nm³',
-            'Operating Temperature': 'Up to 400 °C',
-            'Material of Construction': 'Mild Steel / SS / Special Alloys',
-            'Design Type': 'Standard / High Efficiency',
-            'Pressure Drop': '800 – 1500 Pa',
-            'Customization': 'Available as per process requirement'
-          }
+          technical_specs: typeof solution.technical_specs === 'string'
+            ? (() => { try { return JSON.parse(solution.technical_specs as any); } catch { return {}; } })()
+            : (solution.technical_specs || {
+                'Application': 'Cement, Power, Steel, Food, Chemical, Mining & more',
+                'Gas Flow Capacity': '500 – 500,000 CMH',
+                'Collection Efficiency': '85% - 95% (for particulate size > 5 microns)',
+                'Inlet Dust Load': 'Up to 50 g/Nm³',
+                'Operating Temperature': 'Up to 400 °C',
+                'Material of Construction': 'Mild Steel / SS / Special Alloys',
+                'Design Type': 'Standard / High Efficiency',
+                'Pressure Drop': '800 – 1500 Pa',
+                'Customization': 'Available as per process requirement'
+              })
         }
       ];
 
@@ -191,14 +235,82 @@ export const SolutionDetailPage: React.FC = () => {
     setSelectedProductIndex((prev) => (prev < subProducts.length - 1 ? prev + 1 : 0));
   };
 
+  // Helper to render full description with automatic numbered/bullet points
+  const renderFullDescription = (text?: string) => {
+    if (!text) return null;
+
+    // Check if text already has HTML tags
+    if (/<[a-z][\s\S]*>/i.test(text)) {
+      return (
+        <div 
+          className="text-xs sm:text-sm text-gray-600 mt-3 leading-relaxed max-w-3xl prose prose-sm prose-amber"
+          dangerouslySetInnerHTML={{ __html: text }}
+        />
+      );
+    }
+
+    // Check if text has numbered items like "1. ", "2. "
+    const matches = text.match(/\d+[\.\)]\s*[^0-9\n]+/g);
+    if (matches && matches.length >= 2) {
+      const firstNumIdx = text.search(/\d+[\.\)]/);
+      const intro = firstNumIdx > 0 ? text.substring(0, firstNumIdx).trim() : '';
+      const items = matches.map((m) => m.replace(/^\d+[\.\)]\s*/, '').trim()).filter(Boolean);
+
+      return (
+        <div className="mt-3 space-y-3 max-w-3xl">
+          {intro && (
+            <p className="text-xs sm:text-sm text-gray-700 font-semibold leading-relaxed">
+              {intro}
+            </p>
+          )}
+          <ul className="space-y-2.5">
+            {items.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-gray-700">
+                <span className="w-5 h-5 rounded-full bg-amberAccent/20 text-[#A86400] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5 border border-amberAccent/40 font-display">
+                  {idx + 1}
+                </span>
+                <span className="leading-relaxed">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    // Check for lines starting with bullets
+    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length > 1 && lines.some((l) => l.startsWith('•') || l.startsWith('-') || l.startsWith('*'))) {
+      return (
+        <div className="mt-3 space-y-2.5 max-w-3xl">
+          <ul className="space-y-2.5">
+            {lines.map((line, idx) => {
+              const clean = line.replace(/^[•\-\*]\s*/, '').trim();
+              return (
+                <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-700">
+                  <span className="w-2 h-2 rounded-full bg-amberAccent shrink-0 mt-2" />
+                  <span className="leading-relaxed">{clean}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    }
+
+    return (
+      <div className="text-xs sm:text-sm text-gray-600 mt-3 leading-relaxed max-w-3xl space-y-2 whitespace-pre-line">
+        {text}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-white text-[#1E2024] font-body selection:bg-amberAccent selection:text-white">
       
       {/* ========================================================================= */}
-      {/* 1. TOP DARK HERO BANNER (EXACT REFERENCE DESIGN) */}
+      {/* 1. TOP DARK HERO BANNER */}
       {/* ========================================================================= */}
       <section className="relative pt-36 pb-16 lg:pt-44 lg:pb-20 overflow-hidden bg-[#0A0D12] text-white">
-        {/* Background Image with Dark Vignette */}
         <img 
           src={getImageUrl(solution.hero_image_url) || "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?q=80&w=1920&auto=format&fit=crop"} 
           alt={solution.title} 
@@ -218,7 +330,7 @@ export const SolutionDetailPage: React.FC = () => {
           </div>
 
           <div className="max-w-3xl space-y-4">
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[1.1]">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[1.05]">
               {solution.title}
             </h1>
 
@@ -227,19 +339,19 @@ export const SolutionDetailPage: React.FC = () => {
             </p>
 
             {/* Action Buttons */}
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <a
-                href="#inquiry-form-section"
-                className="px-6 py-3.5 rounded-lg bg-amberAccent hover:bg-amberAccentDark text-[#111] font-display font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amberAccent/20 transition-all hover:-translate-y-0.5"
+            <div className="pt-4 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => openConsultationModal(solution.title)}
+                className="px-6 py-3.5 rounded-lg bg-amberAccent hover:bg-amberAccentDark text-inkBlack font-display font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-amberGlow transition-all hover:-translate-y-0.5 cursor-pointer"
               >
-                REQUEST TECHNICAL AUDIT <ArrowRight className="w-4 h-4" />
-              </a>
+                ENQUIRE NOW <ArrowRight className="w-4 h-4" />
+              </button>
 
               <a
                 href="#inquiry-form-section"
-                className="px-6 py-3.5 rounded-lg bg-transparent hover:bg-white/10 text-white font-display font-bold text-xs uppercase tracking-wider border border-white/30 flex items-center gap-2 transition-all"
+                className="px-6 py-3.5 rounded-lg bg-transparent hover:bg-white/10 text-white font-display font-bold text-xs uppercase tracking-wider border border-white/30 flex items-center gap-2 transition-all cursor-pointer"
               >
-                INQUIRE NOW <ArrowRight className="w-4 h-4 text-amberAccent" />
+                REQUEST AUDIT <ArrowRight className="w-4 h-4 text-amberAccent" />
               </a>
             </div>
           </div>
@@ -279,27 +391,27 @@ export const SolutionDetailPage: React.FC = () => {
                 <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#111] tracking-tight">
                   What We Cover
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-600 mt-3 leading-relaxed max-w-3xl">
-                  {solution.full_description || solution.short_description}
-                </p>
+                {renderFullDescription(solution.full_description || solution.short_description)}
               </div>
 
-              {/* 3 Scope Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              {/* 3 Scope Cards Grid (Equal Width and Equal Height) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 items-stretch">
                 {scopeCards.slice(0, 3).map((card, idx) => (
                   <div 
                     key={idx} 
-                    className="p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-md transition-all hover:border-amberAccent/40 space-y-3 group"
+                    className="p-6 rounded-2xl bg-white border border-gray-200/90 shadow-sm hover:shadow-md transition-all hover:border-amberAccent/40 space-y-3 group h-full flex flex-col justify-between"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-amberAccent/10 text-amberAccent flex items-center justify-center">
-                      {renderIcon(card.icon_name, "w-5 h-5")}
+                    <div className="space-y-3">
+                      <div className="w-10 h-10 rounded-xl bg-amberAccent/10 text-amberAccent flex items-center justify-center">
+                        {renderIcon(card.icon_name, "w-5 h-5")}
+                      </div>
+                      <h3 className="font-display text-sm font-bold text-[#111] leading-snug">
+                        {card.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        {card.description}
+                      </p>
                     </div>
-                    <h3 className="font-display text-sm font-bold text-[#111] leading-snug">
-                      {card.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed">
-                      {card.description}
-                    </p>
                   </div>
                 ))}
               </div>
@@ -327,20 +439,20 @@ export const SolutionDetailPage: React.FC = () => {
                   </a>
 
                   <a 
-                    href={`mailto:${settings?.email || 'antrixxtechnology@gmail.com'}`} 
+                    href={`mailto:${settings?.email || 'antrixtechnology@gmail.com'}`} 
                     className="flex items-center gap-3 p-3 rounded-xl bg-offWhite border border-gray-200/80 hover:text-amberAccent transition-colors"
                   >
                     <Mail className="w-4 h-4 text-amberAccent shrink-0" />
-                    <span className="truncate">{settings?.email || 'antrixxtechnology@gmail.com'}</span>
+                    <span className="truncate">{settings?.email || 'antrixtechnology@gmail.com'}</span>
                   </a>
                 </div>
 
-                <a
-                  href="#inquiry-form-section"
-                  className="w-full py-3 px-4 rounded-xl bg-amberAccent hover:bg-amberAccentDark text-[#111] font-display font-bold text-xs uppercase tracking-wider text-center block shadow-md shadow-amberAccent/20 transition-all"
+                <button
+                  onClick={() => openConsultationModal(solution.title)}
+                  className="w-full py-3.5 px-4 rounded-xl bg-amberAccent hover:bg-amberAccentDark text-inkBlack font-display font-black text-xs uppercase tracking-wider text-center block shadow-amberGlow transition-all cursor-pointer hover:-translate-y-0.5"
                 >
-                  REQUEST TECHNICAL AUDIT <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" />
-                </a>
+                  ENQUIRE NOW <ArrowRight className="w-3.5 h-3.5 inline-block ml-1" />
+                </button>
               </div>
             </div>
 
@@ -363,7 +475,7 @@ export const SolutionDetailPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3.5 gap-x-8">
             {productsAndServices.map((item, idx) => (
               <div key={idx} className="flex items-start gap-2.5 text-xs font-semibold text-gray-800">
                 <CheckCircle2 className="w-4 h-4 text-amberAccent shrink-0 mt-0.5" />
@@ -375,7 +487,7 @@ export const SolutionDetailPage: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
-      {/* 4. SECTION 3: EXPLORE OUR PRODUCTS & TECHNICAL SPECS */}
+      {/* 4. SECTION 3: EXPLORE PRODUCTS & TECHNICAL SPECS (EQUAL-HEIGHT SHOWCASE) */}
       {/* ========================================================================= */}
       <section className="py-16 sm:py-20 bg-white border-t border-gray-100">
         <div className="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -383,47 +495,52 @@ export const SolutionDetailPage: React.FC = () => {
           {/* Header */}
           <div>
             <span className="text-amberAccent text-xs font-black uppercase tracking-widest block mb-1 font-display">
-              OUR PRODUCTS
+              {subProducts.length > 1 ? 'OUR PRODUCTS & MODELS' : 'ENGINEERING SPECIFICATIONS'}
             </span>
             <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#111]">
-              Explore Our {solution.title}
+              {subProducts.length > 1 ? `Explore Our ${solution.title}` : `${solution.title} Specifications`}
             </h2>
           </div>
 
-          {subProducts.length > 1 ? (
-            /* Multi-Product Layout (Matching Reference Design exactly) */
-            <div className="space-y-8">
-              {/* Top Equipment Photo Cards Carousel */}
-              <div className="relative flex items-center gap-4">
-                <button
-                  onClick={handlePrevProduct}
-                  className="w-9 h-9 rounded-full bg-[#111] text-white hover:bg-amberAccent hover:text-[#111] flex items-center justify-center shrink-0 transition-all shadow-md"
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
+          {/* Interactive Multi-Model Carousel if Multiple Sub-Products Exist */}
+          {subProducts.length > 1 && (
+            <div className="relative flex items-center gap-3">
+              <button
+                onClick={handlePrevProduct}
+                className="w-10 h-10 rounded-full bg-[#111] text-white hover:bg-amberAccent hover:text-inkBlack flex items-center justify-center shrink-0 transition-all shadow-md cursor-pointer"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 flex-1">
+              {/* Desktop View: Grid of all models */}
+              <div className="flex-1">
+                <div className="hidden md:grid md:grid-cols-3 gap-5">
                   {subProducts.map((prod, idx) => {
                     const isSelected = idx === selectedProductIndex;
                     return (
                       <div
                         key={prod.id || idx}
                         onClick={() => setSelectedProductIndex(idx)}
-                        className={`rounded-2xl p-4 transition-all cursor-pointer bg-white text-center space-y-3 ${
+                        className={`rounded-2xl p-3.5 transition-all cursor-pointer bg-white text-center space-y-2.5 ${
                           isSelected
-                            ? 'border-2 border-amberAccent shadow-md'
-                            : 'border border-gray-200 hover:border-gray-300 shadow-sm'
+                            ? 'border-2 border-amberAccent shadow-md ring-2 ring-amberAccent/20'
+                            : 'border border-gray-200 hover:border-gray-300 shadow-sm opacity-80 hover:opacity-100'
                         }`}
                       >
-                        <div className="h-44 w-full rounded-xl overflow-hidden bg-gray-100">
+                        <div className="h-36 w-full rounded-xl overflow-hidden bg-gray-100 relative">
                           <img
                             src={getImageUrl(prod.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
                             alt={prod.name}
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                           />
+                          {isSelected && (
+                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amberAccent text-inkBlack text-[9px] font-black uppercase tracking-wider font-display shadow-sm">
+                              Active
+                            </span>
+                          )}
                         </div>
-                        <h3 className={`font-display text-xs font-extrabold ${isSelected ? 'text-amberAccent' : 'text-[#111]'}`}>
+                        <h3 className={`font-display text-xs font-extrabold truncate ${isSelected ? 'text-amberAccent' : 'text-[#111]'}`}>
                           {prod.name}
                         </h3>
                       </div>
@@ -431,94 +548,81 @@ export const SolutionDetailPage: React.FC = () => {
                   })}
                 </div>
 
-                <button
-                  onClick={handleNextProduct}
-                  className="w-9 h-9 rounded-full bg-[#111] text-white hover:bg-amberAccent hover:text-[#111] flex items-center justify-center shrink-0 transition-all shadow-md"
-                  aria-label="Next"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+                {/* Mobile View: 1 card slider with indicator */}
+                <div className="block md:hidden">
+                  <div className="rounded-2xl p-4 bg-white border-2 border-amberAccent shadow-md text-center space-y-2">
+                    <div className="h-44 w-full rounded-xl overflow-hidden bg-gray-100">
+                      <img
+                        src={getImageUrl(currentProduct.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
+                        alt={currentProduct.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h3 className="font-display text-sm font-extrabold text-amberAccent">
+                      {currentProduct.name}
+                    </h3>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                      Model {selectedProductIndex + 1} of {subProducts.length}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              {/* Split Specs Area: Left Product Tabs + Right Table */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
-                {/* Left Vertical Product Selection Buttons (4 cols) */}
-                <div className="lg:col-span-4 space-y-2.5">
-                  {subProducts.map((prod, idx) => {
-                    const isSelected = idx === selectedProductIndex;
-                    return (
-                      <button
-                        key={prod.id || idx}
-                        onClick={() => setSelectedProductIndex(idx)}
-                        className={`w-full p-4 rounded-xl font-display font-bold text-xs text-left flex items-center gap-3 transition-all ${
-                          isSelected
-                            ? 'bg-amberAccent text-white shadow-amberGlow'
-                            : 'bg-white border border-gray-200 text-gray-700 hover:bg-offWhite'
-                        }`}
-                      >
-                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-white/20 text-white' : 'bg-offWhite text-amberAccent'}`}>
-                          {renderIcon(idx === 0 ? 'Wind' : idx === 1 ? 'Layers' : 'Droplets', "w-4 h-4")}
-                        </div>
-                        <span className="truncate">{prod.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+              <button
+                onClick={handleNextProduct}
+                className="w-10 h-10 rounded-full bg-[#111] text-white hover:bg-amberAccent hover:text-inkBlack flex items-center justify-center shrink-0 transition-all shadow-md cursor-pointer"
+                aria-label="Next"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
 
-                {/* Right Technical Specs Table (8 cols) */}
-                <div className="lg:col-span-8 bg-[#FAFAFC] rounded-2xl border border-gray-200 p-6 sm:p-7 shadow-sm space-y-4">
-                  <div className="border-b border-gray-200 pb-3">
-                    <h3 className="font-display text-sm font-extrabold text-[#111]">
+          {/* Equal-Height Showcase: Left Image Card + Right Technical Specs Table */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch pt-2">
+            
+            {/* Left Photo Card (5 cols) - Exactly matches right card height */}
+            <div className="lg:col-span-5 rounded-2xl p-5 bg-[#FAFAFC] border-2 border-amberAccent/40 shadow-sm flex flex-col justify-between h-full space-y-4">
+              <div className="w-full flex-1 min-h-[280px] rounded-xl overflow-hidden bg-gray-100 relative">
+                <img
+                  src={getImageUrl(currentProduct.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
+                  alt={currentProduct.name}
+                  className="absolute inset-0 w-full h-full object-cover transition-all duration-300"
+                />
+              </div>
+              <div className="pt-1 text-center">
+                <span className="text-amberAccent text-[10px] font-bold uppercase tracking-widest block font-display">
+                  {subProducts.length > 1 ? `Model ${selectedProductIndex + 1} of ${subProducts.length}` : 'Core Equipment'}
+                </span>
+                <h3 className="font-display text-sm font-extrabold text-inkBlack mt-0.5">
+                  {currentProduct.name}
+                </h3>
+                {currentProduct.description && (
+                  <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto leading-relaxed">
+                    {currentProduct.description}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Right Technical Specs Table (7 cols) - Matches left card height */}
+            <div className="lg:col-span-7 bg-[#FAFAFC] rounded-2xl border border-gray-200 p-6 sm:p-7 shadow-sm space-y-4 h-full flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="border-b border-gray-200 pb-3 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 font-display block">
+                      EQUIPMENT SPECIFICATIONS
+                    </span>
+                    <h3 className="font-display text-sm sm:text-base font-extrabold text-[#111]">
                       Technical Specifications – <span className="text-amberAccent">{currentProduct.name}</span>
                     </h3>
                   </div>
-
-                  {currentProduct.technical_specs && Object.keys(currentProduct.technical_specs).length > 0 ? (
-                    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
-                      <table className="w-full text-left text-xs">
-                        <tbody className="divide-y divide-gray-100">
-                          {Object.entries(currentProduct.technical_specs).map(([paramKey, paramVal], sIdx) => (
-                            <tr key={sIdx} className={sIdx % 2 === 0 ? 'bg-white' : 'bg-offWhite/50'}>
-                              <td className="py-2.5 px-4 font-bold text-[#111] w-2/5 border-r border-gray-100 align-top text-xs">
-                                {paramKey}
-                              </td>
-                              <td className="py-2.5 px-4 text-gray-700 font-medium align-top text-xs">
-                                {paramVal}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <p className="text-xs text-gray-400 py-6 text-center">Technical specifications standard available upon process audit.</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            /* Single Product Side-by-Side Clean Layout (Perfect Horizontal Alignment) */
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Left Photo Card (5 cols) */}
-              <div className="lg:col-span-5 rounded-2xl p-4 bg-[#FAFAFC] border-2 border-amberAccent/40 shadow-sm space-y-3">
-                <div className="h-64 sm:h-72 w-full rounded-xl overflow-hidden bg-gray-100">
-                  <img
-                    src={getImageUrl(currentProduct.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
-                    alt={currentProduct.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="font-display text-sm font-extrabold text-amberAccent text-center">
-                  {currentProduct.name}
-                </h3>
-              </div>
-
-              {/* Right Technical Specs Table (7 cols) */}
-              <div className="lg:col-span-7 bg-[#FAFAFC] rounded-2xl border border-gray-200 p-6 sm:p-7 shadow-sm space-y-4">
-                <div className="border-b border-gray-200 pb-3">
-                  <h3 className="font-display text-sm font-extrabold text-[#111]">
-                    Technical Specifications – <span className="text-amberAccent">{currentProduct.name}</span>
-                  </h3>
+                  <button
+                    onClick={() => openConsultationModal(currentProduct.name)}
+                    className="text-xs font-bold text-amberAccent hover:underline cursor-pointer shrink-0"
+                  >
+                    Request Quote ↗
+                  </button>
                 </div>
 
                 {currentProduct.technical_specs && Object.keys(currentProduct.technical_specs).length > 0 ? (
@@ -542,14 +646,66 @@ export const SolutionDetailPage: React.FC = () => {
                   <p className="text-xs text-gray-400 py-6 text-center">Technical specifications standard available upon process audit.</p>
                 )}
               </div>
+
+              <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
+                <span className="text-[11px] text-gray-500 font-medium">
+                  Need customized technical sizing?
+                </span>
+                <button
+                  onClick={() => openConsultationModal(currentProduct.name)}
+                  className="px-4 py-2 rounded-lg bg-amberAccent hover:bg-amberAccentDark text-inkBlack font-display font-bold text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer"
+                >
+                  Enquire for this Model →
+                </button>
+              </div>
             </div>
-          )}
+
+          </div>
 
         </div>
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. INQUIRY / TECHNICAL AUDIT FORM SECTION */}
+      {/* 5. NEWSLETTER SUBSCRIPTION BANNER */}
+      {/* ========================================================================= */}
+      <section className="bg-[#11141B] text-white py-12 border-t border-b border-gray-800">
+        <div className="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="space-y-1 max-w-xl">
+              <span className="text-amberAccent text-[10px] font-bold uppercase tracking-widest font-display block">
+                STAY CONNECTED WITH ANTRIXX
+              </span>
+              <h2 className="font-display text-xl sm:text-2xl font-extrabold text-white">
+                Subscribe to Industrial Energy & Utility Insights
+              </h2>
+              <p className="text-xs text-gray-400">
+                Get latest updates, engineering bulletins and case studies on pollution control solutions and steam efficiency.
+              </p>
+            </div>
+
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 min-w-full sm:min-w-[420px]">
+              <input
+                type="email"
+                required
+                placeholder="Enter your professional email address"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                className="flex-1 bg-[#0E1117] border border-[#363C47] text-white text-xs px-4 py-3 rounded-lg focus:outline-none focus:border-amberAccent"
+              />
+              <button
+                type="submit"
+                disabled={newsletterSubmitting}
+                className="px-6 py-3 rounded-lg bg-amberAccent hover:bg-amberAccentDark text-inkBlack font-display font-black text-xs uppercase tracking-wider shadow-amberGlow transition-all cursor-pointer shrink-0 disabled:opacity-50"
+              >
+                {newsletterSubmitting ? 'SUBSCRIBING...' : 'SUBSCRIBE'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 6. INQUIRY / TECHNICAL AUDIT FORM SECTION */}
       {/* ========================================================================= */}
       <section id="inquiry-form-section" className="py-16 bg-[#0F1318] text-white">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -617,13 +773,13 @@ export const SolutionDetailPage: React.FC = () => {
                     placeholder="Describe your plant equipment or project scope..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full p-2.5 rounded-lg bg-white/10 text-white placeholder-gray-400 border border-white/10 focus:outline-none focus:border-amberAccent text-xs"
+                    className="w-full p-2.5 rounded-lg bg-white/10 text-white placeholder-gray-400 border border-white/10 focus:outline-none focus:border-amberAccent text-xs resize-none"
                   />
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3 rounded-lg bg-amberAccent hover:bg-amberAccentDark text-[#111] font-display font-bold text-xs uppercase tracking-wider shadow-lg shadow-amberAccent/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    className="w-full py-3.5 rounded-lg bg-amberAccent hover:bg-amberAccentDark text-inkBlack font-display font-black text-xs uppercase tracking-wider shadow-amberGlow flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting ? 'SUBMITTING...' : 'SUBMIT TECHNICAL INQUIRY'}
                     <Send className="w-3.5 h-3.5" />
@@ -635,6 +791,14 @@ export const SolutionDetailPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed right-5 bottom-5 z-50 bg-[#151922] text-white px-5 py-3.5 rounded-xl border-l-4 border-amberAccent shadow-2xl text-xs flex items-center gap-3 animate-slideUp">
+          <CheckCircle2 className="w-4 h-4 text-amberAccent shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
     </div>
   );

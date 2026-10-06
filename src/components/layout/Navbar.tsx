@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Phone, ChevronDown, Menu, X, ArrowRight, Activity, Flame, Wind, Layers, Truck, Cpu, Zap } from 'lucide-react';
 import { getSolutions, SolutionItem, getImageUrl } from '../../api/client';
+import { useModal } from '../../context/ModalContext';
 
 export const Navbar: React.FC = () => {
+  const { openConsultationModal } = useModal();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [solutionsDropdownOpen, setSolutionsDropdownOpen] = useState(false);
@@ -206,12 +208,12 @@ export const Navbar: React.FC = () => {
               +91 9748636108
             </a>
 
-            <Link
-              to="/contact"
-              className="px-5 py-2.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white text-xs font-display font-extrabold hover:-translate-y-1 transition-all flex items-center gap-1.5 uppercase"
+            <button
+              onClick={() => openConsultationModal('General Engineering Consultation')}
+              className="px-5 py-2.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-inkBlack text-xs font-display font-extrabold hover:-translate-y-0.5 transition-all flex items-center gap-1.5 uppercase shadow-amberGlow cursor-pointer"
             >
-              GET CONSULTATION <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+              ENQUIRE NOW <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           {/* Mobile Hamburger Toggle */}
@@ -251,12 +253,15 @@ export const Navbar: React.FC = () => {
               </a>
             </div>
 
-            <Link
-              to="/contact"
-              className="w-full flex justify-center items-center gap-2 px-5 py-3 rounded-md bg-inkBlack hover:bg-amberAccent text-white font-display font-bold text-xs uppercase tracking-wider transition-colors"
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openConsultationModal('General Engineering Consultation');
+              }}
+              className="w-full flex justify-center items-center gap-2 px-5 py-3 rounded-md bg-amberAccent hover:bg-amberAccentDark text-inkBlack font-display font-extrabold text-xs uppercase tracking-wider transition-colors shadow-amberGlow cursor-pointer"
             >
-              GET CONSULTATION <ArrowRight className="w-4 h-4" />
-            </Link>
+              ENQUIRE NOW <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
