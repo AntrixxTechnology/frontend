@@ -174,6 +174,7 @@ export interface SiteSettings {
   linkedin_url?: string;
   brochure_pdf_url?: string;
   solutions_hero_title?: string;
+  solutions_hero_accent?: string;
   solutions_hero_description?: string;
   solutions_hero_image_url?: string;
   solutions_hero_badge?: string;
@@ -215,7 +216,7 @@ export const getSiteSettings = async (): Promise<SiteSettings> => {
 
 async function fetchJson<T>(endpoint: string, fallback: T): Promise<T> {
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`);
+    const res = await fetch(`${API_BASE}${endpoint}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {

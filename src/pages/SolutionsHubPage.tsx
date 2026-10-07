@@ -33,6 +33,30 @@ export const SolutionsHubPage: React.FC = () => {
     { num: '05', title: 'Support & Training', desc: 'Technical assistance and operator training for dependable, zero-downtime operation.' },
   ];
 
+  const renderHeroTitle = (rawTitle?: string) => {
+    const text = rawTitle || 'Integrated Industrial Solutions for a Smarter Future.';
+    if (text.includes('Smarter Future')) {
+      const [before, ...afterParts] = text.split('Smarter Future');
+      const after = afterParts.join('Smarter Future');
+      return (
+        <>
+          {before}<span className="text-amberAccent">Smarter Future</span>{after}
+        </>
+      );
+    }
+    const words = text.trim().split(' ');
+    if (words.length > 2) {
+      const head = words.slice(0, -2).join(' ');
+      const tail = words.slice(-2).join(' ');
+      return (
+        <>
+          {head} <span className="text-amberAccent">{tail}</span>
+        </>
+      );
+    }
+    return text;
+  };
+
   return (
     <div className="min-h-screen bg-white text-[#17202A] font-body selection:bg-amberAccent selection:text-white">
       {/* ========================================================================= */}
@@ -51,10 +75,13 @@ export const SolutionsHubPage: React.FC = () => {
               </div>
 
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-[#111923] tracking-tight leading-[1.08]">
-                {settings?.solutions_hero_title ? (
-                  settings.solutions_hero_title
+                {settings?.solutions_hero_accent ? (
+                  <>
+                    {settings.solutions_hero_title || 'Integrated Industrial Solutions for a'}{' '}
+                    <span className="text-amberAccent">{settings.solutions_hero_accent}</span>
+                  </>
                 ) : (
-                  <>Integrated Industrial Solutions for a <span className="text-amberAccent">Smarter Future.</span></>
+                  renderHeroTitle(settings?.solutions_hero_title)
                 )}
               </h1>
 
