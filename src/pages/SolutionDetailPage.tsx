@@ -207,7 +207,7 @@ export const SolutionDetailPage: React.FC = () => {
         {
           id: 'sp-1',
           name: solution.title,
-          image_url: solution.hero_image_url || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop',
+          image_url: solution.hero_image_url || 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/boiler_retrofit_thermic_heater_industrial.jpg',
           description: solution.short_description,
           technical_specs: typeof solution.technical_specs === 'string'
             ? (() => { try { return JSON.parse(solution.technical_specs as any); } catch { return {}; } })()
@@ -530,7 +530,7 @@ export const SolutionDetailPage: React.FC = () => {
                       >
                         <div className="h-36 w-full rounded-xl overflow-hidden bg-gray-100 relative">
                           <img
-                            src={getImageUrl(prod.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
+                            src={getImageUrl(prod.image_url) || "https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/cyclone_dust_collector_industrial.jpg"}
                             alt={prod.name}
                             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                           />
@@ -553,7 +553,7 @@ export const SolutionDetailPage: React.FC = () => {
                   <div className="rounded-2xl p-4 bg-white border-2 border-amberAccent shadow-md text-center space-y-2">
                     <div className="h-44 w-full rounded-xl overflow-hidden bg-gray-100">
                       <img
-                        src={getImageUrl(currentProduct.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
+                        src={getImageUrl(currentProduct.image_url) || "https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/cyclone_dust_collector_industrial.jpg"}
                         alt={currentProduct.name}
                         className="w-full h-full object-cover"
                       />
@@ -585,7 +585,7 @@ export const SolutionDetailPage: React.FC = () => {
             <div className="lg:col-span-5 rounded-2xl p-5 bg-[#FAFAFC] border-2 border-amberAccent/40 shadow-sm flex flex-col justify-between h-full space-y-4">
               <div className="w-full flex-1 min-h-[280px] rounded-xl overflow-hidden bg-gray-100 relative">
                 <img
-                  src={getImageUrl(currentProduct.image_url) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"}
+                  src={getImageUrl(currentProduct.image_url) || "https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/cyclone_dust_collector_industrial.jpg"}
                   alt={currentProduct.name}
                   className="absolute inset-0 w-full h-full object-cover transition-all duration-300"
                 />
