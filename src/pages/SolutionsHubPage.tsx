@@ -24,11 +24,12 @@ export const SolutionsHubPage: React.FC = () => {
     getSolutions().then(setSolutions);
   }, []);
 
-  const equipmentList = [
+  const defaultEquipmentList = [
     {
       name: 'Cyclone Dust Collector',
       category: 'Environment',
       desc: 'Cyclone collectors use centrifugal force to separate and collect coarse and fine particulate matter from industrial gas streams. Designed for high dust loading, low maintenance and continuous duty in harsh operating conditions.',
+      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/cyclone_dust_collector_industrial.jpg',
       specs: [
         ['Application', 'Cement, Power, Steel, Food, Chemical, Mining & Processing'],
         ['Gas Flow Capacity', '500 – 500,000 CMH'],
@@ -44,6 +45,7 @@ export const SolutionsHubPage: React.FC = () => {
       name: 'Bag Filter (Baghouse)',
       category: 'Emission Control',
       desc: 'Pulse-Jet Baghouse systems capture fine particles from gas streams through selected high-grade filter media. Configuration and media are chosen to suit dust characteristics, flue gas moisture, temperature and CPCB compliance.',
+      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/baghouse_bag_filter_industrial.jpg',
       specs: [
         ['Application', 'Boilers, Cement, Steel, Food Processing, Chemical & Agro Mills'],
         ['Gas Flow Capacity', '1,000 – 300,000 CMH tailored to process duty'],
@@ -59,6 +61,7 @@ export const SolutionsHubPage: React.FC = () => {
       name: 'Spray Type Wet Scrubber',
       category: 'Gas Cleaning',
       desc: 'Wet scrubbers bring industrial gas streams into intimate contact with a scrubbing liquid to capture dust, acidic vapors, and soluble or reactive pollutants with zero clogging and continuous liquid re-circulation.',
+      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/spray_wet_scrubber_industrial.jpg',
       specs: [
         ['Application', 'Boiler Exhaust, Chemical Vapors, Acidic Mists, Metallurgical Exhaust'],
         ['Gas Flow Capacity', 'Custom engineered to match flue gas volume'],
@@ -74,6 +77,7 @@ export const SolutionsHubPage: React.FC = () => {
       name: 'Electrostatic Precipitator (ESP)',
       category: 'Power & Utility',
       desc: 'Electrostatic Precipitators utilize high-voltage electrical fields to charge and collect suspended particulate matter from large volume gas streams, delivering ultra-low stack emissions with minimal system pressure drop.',
+      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/electrostatic_precipitator_esp_industrial.jpg',
       specs: [
         ['Application', 'Utility Boilers, Biomass Power, Cement Kilns, Foundry Exhaust'],
         ['Gas Flow Capacity', 'Large volume continuous industrial exhaust'],
@@ -87,6 +91,36 @@ export const SolutionsHubPage: React.FC = () => {
     },
   ];
 
+  // Dynamically pull Pollution Control Equipment models from CMS database if present
+  const pollutionSolution = solutions.find(
+    (s) => s.slug === 'pollution-control-equipment' || s.slug === 'boiler-automation' || s.title?.toLowerCase().includes('pollution')
+  );
+
+  let dynamicEquipmentList = defaultEquipmentList;
+  if (pollutionSolution?.sub_products) {
+    const rawSubs = pollutionSolution.sub_products;
+    const parsedSubs: any[] = typeof rawSubs === 'string'
+      ? (() => { try { return JSON.parse(rawSubs); } catch { return []; } })()
+      : (Array.isArray(rawSubs) ? rawSubs : []);
+
+    if (parsedSubs.length > 0) {
+      dynamicEquipmentList = parsedSubs.map((sub, idx) => {
+        const fallback = defaultEquipmentList[idx] || defaultEquipmentList[0];
+        const specsEntries = sub.technical_specs && typeof sub.technical_specs === 'object'
+          ? Object.entries(sub.technical_specs).map(([k, v]) => [k, String(v)] as [string, string])
+          : fallback.specs;
+        return {
+          name: sub.name || fallback.name,
+          category: fallback.category,
+          desc: sub.description || fallback.desc,
+          image: sub.image_url || fallback.image,
+          specs: specsEntries.length > 0 ? specsEntries : fallback.specs,
+        };
+      });
+    }
+  }
+
+  const equipmentList = dynamicEquipmentList;
   const currentEquip = equipmentList[activeEquipIndex] || equipmentList[0];
 
   const methodologySteps = [
@@ -373,28 +407,24 @@ export const SolutionsHubPage: React.FC = () => {
             <div className="lg:col-span-7 bg-white rounded-2xl border border-[#E6EAEE] overflow-hidden shadow-sm space-y-0">
               
               {/* Top Banner / Graphic for Active Equipment */}
-              <div className="relative h-44 bg-gradient-to-br from-[#D8E4E9] to-[#91A7B2] flex items-end p-5 overflow-hidden">
-                <svg viewBox="0 0 600 220" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full opacity-60">
-                  <rect width="600" height="220" fill="#CBD9E0" />
-                  <path d="M0 160L110 105H600V220H0Z" fill="#8DA2AD" />
-                  <g stroke="#526C79" strokeWidth="5" fill="#AABAC2">
-                    <rect x="105" y="30" width="100" height="160" rx="17" />
-                    <ellipse cx="155" cy="31" rx="50" ry="11" fill="#E0E7EA" />
-                    <path d="M105 95H205M105 105H205" stroke="#778E99" />
-                    <rect x="250" y="62" width="75" height="128" rx="13" />
-                    <ellipse cx="287" cy="63" rx="37" ry="9" fill="#E0E7EA" />
-                    <path d="M155 30V12Q155 2 175 2H220Q238 2 238 22V62" fill="none" stroke="#AABAC2" strokeWidth="16" />
-                    <path d="M325 120H390V145H450" fill="none" stroke="#AABAC2" strokeWidth="15" />
-                  </g>
-                  <path d="M0 190H600" stroke="#526B78" strokeWidth="9" />
-                </svg>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0D1721]/90 via-[#0D1721]/30 to-transparent" />
+              <div className="relative h-52 bg-[#0D1721] flex items-end p-5 overflow-hidden group">
+                {currentEquip.image ? (
+                  <img
+                    key={currentEquip.image}
+                    src={getImageUrl(currentEquip.image)}
+                    alt={currentEquip.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#111923] to-[#243342]" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0D1721] via-[#0D1721]/50 to-transparent" />
                 
                 <div className="relative z-10">
-                  <span className="text-[#FFC15C] text-[9px] font-bold uppercase tracking-widest block">
+                  <span className="text-[#FFC15C] text-[10px] font-bold uppercase tracking-widest block font-display">
                     {currentEquip.category}
                   </span>
-                  <h3 className="font-display text-lg font-extrabold text-white">
+                  <h3 className="font-display text-xl font-extrabold text-white mt-0.5">
                     {currentEquip.name}
                   </h3>
                 </div>
