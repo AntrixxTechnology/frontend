@@ -12,116 +12,18 @@ import {
   CheckCircle2,
   ExternalLink,
 } from 'lucide-react';
-import { getSolutions, SolutionItem, getImageUrl } from '../api/client';
+import { getSolutions, getSiteSettings, SolutionItem, SiteSettings, getImageUrl } from '../api/client';
 import { useModal } from '../context/ModalContext';
 
 export const SolutionsHubPage: React.FC = () => {
   const { openConsultationModal } = useModal();
   const [solutions, setSolutions] = useState<SolutionItem[]>([]);
-  const [activeEquipIndex, setActiveEquipIndex] = useState<number>(0);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     getSolutions().then(setSolutions);
+    getSiteSettings().then(setSettings);
   }, []);
-
-  const defaultEquipmentList = [
-    {
-      name: 'Cyclone Dust Collector',
-      category: 'Environment',
-      desc: 'Cyclone collectors use centrifugal force to separate and collect coarse and fine particulate matter from industrial gas streams. Designed for high dust loading, low maintenance and continuous duty in harsh operating conditions.',
-      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/cyclone_dust_collector_industrial.jpg',
-      specs: [
-        ['Application', 'Cement, Power, Steel, Food, Chemical, Mining & Processing'],
-        ['Gas Flow Capacity', '500 – 500,000 CMH'],
-        ['Collection Efficiency', '85% – 95% for particles > 5 microns'],
-        ['Inlet Dust Load', 'Up to 50 g/Nm³'],
-        ['Operating Temperature', 'Up to 400 °C'],
-        ['Construction', 'Mild Steel / Stainless Steel / Abrasion-Resistant Alloys'],
-        ['Design Type', 'Standard / High Efficiency Aerodynamic Volute'],
-        ['Pressure Drop', '800 – 1,500 Pa'],
-      ],
-    },
-    {
-      name: 'Bag Filter (Baghouse)',
-      category: 'Emission Control',
-      desc: 'Pulse-Jet Baghouse systems capture fine particles from gas streams through selected high-grade filter media. Configuration and media are chosen to suit dust characteristics, flue gas moisture, temperature and CPCB compliance.',
-      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/baghouse_bag_filter_industrial.jpg',
-      specs: [
-        ['Application', 'Boilers, Cement, Steel, Food Processing, Chemical & Agro Mills'],
-        ['Gas Flow Capacity', '1,000 – 300,000 CMH tailored to process duty'],
-        ['Filter Media', 'PTFE Membrane, PPS, Nomex, Polyester, Woven Fiberglass'],
-        ['Collection Efficiency', '99.8%+ (guaranteed particulate capture < 30 mg/Nm³)'],
-        ['Air-to-Cloth Ratio', '1.0 m/min conservative design limit'],
-        ['Cleaning System', 'Sequential Online / Offline Pulse-Jet Solenoid'],
-        ['Construction', 'Corrosion-resistant MS / SS316 / Specified Alloys'],
-        ['Customization', 'Explosion vents, rotary air locks, modular hopper design'],
-      ],
-    },
-    {
-      name: 'Spray Type Wet Scrubber',
-      category: 'Gas Cleaning',
-      desc: 'Wet scrubbers bring industrial gas streams into intimate contact with a scrubbing liquid to capture dust, acidic vapors, and soluble or reactive pollutants with zero clogging and continuous liquid re-circulation.',
-      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/spray_wet_scrubber_industrial.jpg',
-      specs: [
-        ['Application', 'Boiler Exhaust, Chemical Vapors, Acidic Mists, Metallurgical Exhaust'],
-        ['Gas Flow Capacity', 'Custom engineered to match flue gas volume'],
-        ['Scrubbing Medium', 'Water or alkaline chemical neutralizing reagent'],
-        ['Removal Performance', '95% – 99% for SOx, acid fumes and particulate mists'],
-        ['Spray Nozzle Type', 'Non-clogging Spiral Spray Nozzles with wide angle coverage'],
-        ['Construction', 'FRP / Polypropylene / SS316L / Acid-Resistant Lined Steel'],
-        ['Design Type', 'Counter-current vertical spray tower with mist eliminator'],
-        ['Slurry Handling', 'Heavy duty recirculation pump with dual basket strainers'],
-      ],
-    },
-    {
-      name: 'Electrostatic Precipitator (ESP)',
-      category: 'Power & Utility',
-      desc: 'Electrostatic Precipitators utilize high-voltage electrical fields to charge and collect suspended particulate matter from large volume gas streams, delivering ultra-low stack emissions with minimal system pressure drop.',
-      image: 'https://cjaeubdycgnwgfkbddvb.supabase.co/storage/v1/object/public/general/electrostatic_precipitator_esp_industrial.jpg',
-      specs: [
-        ['Application', 'Utility Boilers, Biomass Power, Cement Kilns, Foundry Exhaust'],
-        ['Gas Flow Capacity', 'Large volume continuous industrial exhaust'],
-        ['Collection Method', 'High-voltage negative corona discharge and plate rapping'],
-        ['Emission Guarantee', '< 30 mg/Nm³ compliant with strict environmental norms'],
-        ['Operating Temperature', 'Up to 350 °C process specific'],
-        ['Construction', 'Rigid discharge electrodes and heavy fabricated collecting plates'],
-        ['Power Supply', 'High-frequency TR (Transformer-Rectifier) controller set'],
-        ['Customization', 'Multi-field modular casing with automated hopper heating'],
-      ],
-    },
-  ];
-
-  // Dynamically pull Pollution Control Equipment models from CMS database if present
-  const pollutionSolution = solutions.find(
-    (s) => s.slug === 'pollution-control-equipment' || s.slug === 'boiler-automation' || s.title?.toLowerCase().includes('pollution')
-  );
-
-  let dynamicEquipmentList = defaultEquipmentList;
-  if (pollutionSolution?.sub_products) {
-    const rawSubs = pollutionSolution.sub_products;
-    const parsedSubs: any[] = typeof rawSubs === 'string'
-      ? (() => { try { return JSON.parse(rawSubs); } catch { return []; } })()
-      : (Array.isArray(rawSubs) ? rawSubs : []);
-
-    if (parsedSubs.length > 0) {
-      dynamicEquipmentList = parsedSubs.map((sub, idx) => {
-        const fallback = defaultEquipmentList[idx] || defaultEquipmentList[0];
-        const specsEntries = sub.technical_specs && typeof sub.technical_specs === 'object'
-          ? Object.entries(sub.technical_specs).map(([k, v]) => [k, String(v)] as [string, string])
-          : fallback.specs;
-        return {
-          name: sub.name || fallback.name,
-          category: fallback.category,
-          desc: sub.description || fallback.desc,
-          image: sub.image_url || fallback.image,
-          specs: specsEntries.length > 0 ? specsEntries : fallback.specs,
-        };
-      });
-    }
-  }
-
-  const equipmentList = dynamicEquipmentList;
-  const currentEquip = equipmentList[activeEquipIndex] || equipmentList[0];
 
   const methodologySteps = [
     { num: '01', title: 'Consultation', desc: 'We analyze plant requirements, steam load dynamics, and current fuel consumption.' },
@@ -149,11 +51,15 @@ export const SolutionsHubPage: React.FC = () => {
               </div>
 
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-[#111923] tracking-tight leading-[1.08]">
-                Integrated Industrial Solutions for a <span className="text-amberAccent">Smarter Future.</span>
+                {settings?.solutions_hero_title ? (
+                  settings.solutions_hero_title
+                ) : (
+                  <>Integrated Industrial Solutions for a <span className="text-amberAccent">Smarter Future.</span></>
+                )}
               </h1>
 
               <p className="text-xs sm:text-sm text-[#5F6B78] leading-relaxed max-w-xl font-normal">
-                We provide advanced automation, energy optimization, environmental compliance, and turnkey balance-of-plant engineering solutions to enhance thermal efficiency, reduce fuel cost, and build sustainable industries across India.
+                {settings?.solutions_hero_description || 'We provide advanced automation, energy optimization, environmental compliance, and turnkey balance-of-plant engineering solutions to enhance thermal efficiency, reduce fuel cost, and build sustainable industries across India.'}
               </p>
 
               <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -176,35 +82,43 @@ export const SolutionsHubPage: React.FC = () => {
             {/* Right Industrial Engineering Visual Graphic */}
             <div className="lg:col-span-5">
               <div className="relative h-[280px] sm:h-[320px] rounded-2xl overflow-hidden border border-[#D0D9E0] shadow-md bg-gradient-to-br from-[#DCE7ED] to-[#78909E] flex items-end">
-                <svg viewBox="0 0 560 320" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
-                  <rect width="560" height="320" fill="#C6D5DD" />
-                  <path d="M0 170L130 95 280 130 400 65 560 100V320H0Z" fill="#879DA8" />
-                  <g stroke="#536D7A" strokeWidth="5" fill="#344C59">
-                    <path d="M0 180L100 130H280V290H0Z" />
-                    <path d="M0 220H280M0 260H280" fill="none" stroke="#8FA4AE" strokeWidth="6" />
-                    <path d="M40 160V290M105 130V290M180 130V290M245 130V290" fill="none" stroke="#718995" strokeWidth="6" />
-                  </g>
-                  <g stroke="#526C79" strokeWidth="4" fill="#AABAC2">
-                    <rect x="175" y="40" width="70" height="210" rx="15" />
-                    <ellipse cx="210" cy="41" rx="35" ry="9" fill="#DCE4E8" />
-                    <path d="M175 110H245M175 120H245" stroke="#718995" />
-                    <rect x="270" y="75" width="47" height="175" rx="10" />
-                    <ellipse cx="293" cy="76" rx="23" ry="7" fill="#DCE4E8" />
-                    <path d="M210 40V20Q210 7 228 7H260Q278 7 278 26V75" fill="none" stroke="#AABAC2" strokeWidth="16" />
-                    <path d="M317 160H365V185H420" fill="none" stroke="#AABAC2" strokeWidth="14" />
-                  </g>
-                  <rect x="365" y="95" width="115" height="195" fill="#A9612E" stroke="#526B78" strokeWidth="5" />
-                  <path d="M400 97V290M440 97V290" stroke="#D69B5D" strokeWidth="8" />
-                  <rect x="480" y="170" width="80" height="120" fill="#09649D" stroke="#526B78" strokeWidth="5" />
-                  <path d="M0 290H560" stroke="#526B78" strokeWidth="10" />
-                </svg>
+                {settings?.solutions_hero_image_url ? (
+                  <img
+                    src={getImageUrl(settings.solutions_hero_image_url)}
+                    alt="Antrixx Industrial Solutions"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <svg viewBox="0 0 560 320" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
+                    <rect width="560" height="320" fill="#C6D5DD" />
+                    <path d="M0 170L130 95 280 130 400 65 560 100V320H0Z" fill="#879DA8" />
+                    <g stroke="#536D7A" strokeWidth="5" fill="#344C59">
+                      <path d="M0 180L100 130H280V290H0Z" />
+                      <path d="M0 220H280M0 260H280" fill="none" stroke="#8FA4AE" strokeWidth="6" />
+                      <path d="M40 160V290M105 130V290M180 130V290M245 130V290" fill="none" stroke="#718995" strokeWidth="6" />
+                    </g>
+                    <g stroke="#526C79" strokeWidth="4" fill="#AABAC2">
+                      <rect x="175" y="40" width="70" height="210" rx="15" />
+                      <ellipse cx="210" cy="41" rx="35" ry="9" fill="#DCE4E8" />
+                      <path d="M175 110H245M175 120H245" stroke="#718995" />
+                      <rect x="270" y="75" width="47" height="175" rx="10" />
+                      <ellipse cx="293" cy="76" rx="23" ry="7" fill="#DCE4E8" />
+                      <path d="M210 40V20Q210 7 228 7H260Q278 7 278 26V75" fill="none" stroke="#AABAC2" strokeWidth="16" />
+                      <path d="M317 160H365V185H420" fill="none" stroke="#AABAC2" strokeWidth="14" />
+                    </g>
+                    <rect x="365" y="95" width="115" height="195" fill="#A9612E" stroke="#526B78" strokeWidth="5" />
+                    <path d="M400 97V290M440 97V290" stroke="#D69B5D" strokeWidth="8" />
+                    <rect x="480" y="170" width="80" height="120" fill="#09649D" stroke="#526B78" strokeWidth="5" />
+                    <path d="M0 290H560" stroke="#526B78" strokeWidth="10" />
+                  </svg>
+                )}
 
                 {/* Floating Engineering Badge */}
                 <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:left-4 sm:bottom-4 z-10 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/60 shadow-lg text-[10px] text-[#687482]">
                   <strong className="block text-xs font-extrabold text-[#17202A] font-display">
                     Engineering the next level
                   </strong>
-                  Efficiency · Reliability · Sustainability
+                  {settings?.solutions_hero_badge || 'Efficiency · Reliability · Sustainability'}
                 </div>
               </div>
             </div>
@@ -347,144 +261,7 @@ export const SolutionsHubPage: React.FC = () => {
       </section>
 
       {/* ========================================================================= */}
-      {/* 4. INTERACTIVE IN-PAGE EQUIPMENT PREVIEW WIDGET */}
-      {/* ========================================================================= */}
-      <section className="py-16 sm:py-20 bg-[#F6F8F9] border-t border-b border-[#E6EAEE]">
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Left Intro & Equipment Tabs (5 cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              <div>
-                <span className="text-[#C98208] text-[10px] font-black uppercase tracking-widest font-display block mb-1">
-                  ENVIRONMENTAL SOLUTIONS
-                </span>
-                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#111923] tracking-tight">
-                  Pollution Control Equipment
-                </h2>
-                <p className="text-xs text-[#647180] mt-2 leading-relaxed">
-                  Engineered systems to manage industrial dust, particulate emissions and suitable process gases—supporting cleaner operations and environmental compliance.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {equipmentList.map((eq, idx) => {
-                  const isActive = idx === activeEquipIndex;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveEquipIndex(idx)}
-                      className={`w-full p-3.5 rounded-xl border text-left font-display font-bold text-xs flex items-center justify-between transition-all cursor-pointer ${
-                        isActive
-                          ? 'bg-amberAccent border-amberAccent text-inkBlack shadow-amberGlow'
-                          : 'bg-white border-[#E6EAEE] text-[#17202A] hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`text-base font-normal ${isActive ? 'text-inkBlack' : 'text-[#697785]'}`}>
-                          {idx === 0 ? '◉' : idx === 1 ? '▤' : idx === 2 ? '♧' : '▥'}
-                        </span>
-                        <span>{eq.name}</span>
-                      </div>
-                      <ArrowRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'translate-x-1' : 'opacity-40'}`} />
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="pt-2">
-                <Link
-                  to="/solutions/pollution-control-equipment"
-                  className="inline-flex items-center gap-2 text-xs font-bold text-[#111923] hover:text-amberAccent transition-colors"
-                >
-                  View Full Pollution Control Deep-Dive <ExternalLink className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Live Specifications Table Card (7 cols) */}
-            <div className="lg:col-span-7 bg-white rounded-2xl border border-[#E6EAEE] overflow-hidden shadow-sm space-y-0">
-              
-              {/* Top Banner / Graphic for Active Equipment */}
-              <div className="relative h-52 bg-[#0D1721] flex items-end p-5 overflow-hidden group">
-                {currentEquip.image ? (
-                  <img
-                    key={currentEquip.image}
-                    src={getImageUrl(currentEquip.image)}
-                    alt={currentEquip.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#111923] to-[#243342]" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0D1721] via-[#0D1721]/50 to-transparent" />
-                
-                <div className="relative z-10">
-                  <span className="text-[#FFC15C] text-[10px] font-bold uppercase tracking-widest block font-display">
-                    {currentEquip.category}
-                  </span>
-                  <h3 className="font-display text-xl font-extrabold text-white mt-0.5">
-                    {currentEquip.name}
-                  </h3>
-                </div>
-              </div>
-
-              {/* Body Content & Spec Table */}
-              <div className="p-6 space-y-4">
-                <p className="text-xs text-[#647180] leading-relaxed">
-                  {currentEquip.desc}
-                </p>
-
-                <div className="border-t border-[#EDF0F2] pt-3">
-                  <div className="text-[10px] font-bold text-[#111923] mb-2 font-display">
-                    TECHNICAL SPECIFICATIONS <span className="font-normal text-[#8A949E]">(Indicative; final design depends on process data)</span>
-                  </div>
-
-                  <div className="border border-[#EDF0F2] rounded-xl overflow-hidden bg-white">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <tbody>
-                        {currentEquip.specs.map(([paramKey, paramVal], sIdx) => (
-                          <tr key={sIdx} className={sIdx % 2 === 0 ? 'bg-white' : 'bg-[#F9FAFB]'}>
-                            <td className="py-2 px-3 font-bold text-[#17202A] w-[38%] border-b border-[#EDF0F2] text-[11px]">
-                              {paramKey}
-                            </td>
-                            <td className="py-2 px-3 text-[#63707D] border-b border-[#EDF0F2] text-[11px]">
-                              {paramVal}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="pt-2 flex items-center justify-between">
-                  <button
-                    onClick={() => openConsultationModal(currentEquip.name)}
-                    className="px-5 py-2.5 rounded-lg bg-[#111923] hover:bg-amberAccent hover:text-inkBlack text-white font-display font-bold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-                  >
-                    Request Equipment Quote ↗
-                  </button>
-
-                  <Link
-                    to="/solutions/pollution-control-equipment"
-                    className="text-xs font-bold text-amberAccent hover:underline"
-                  >
-                    Explore Full Scope →
-                  </Link>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 5. OUR METHODOLOGY (01 TO 05 CONNECTED STEPS) */}
+      {/* 4. OUR METHODOLOGY (01 TO 05 CONNECTED STEPS) */}
       {/* ========================================================================= */}
       <section className="py-16 sm:py-20 bg-white border-b border-[#E6EAEE]">
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">

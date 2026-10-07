@@ -14,6 +14,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { getIndustries, IndustryItem, getImageUrl } from '../api/client';
+import { useModal } from '../context/ModalContext';
 
 function renderIndustryIcon(iconName: string) {
   const props = { className: 'w-6 h-6 text-amberAccent' };
@@ -30,6 +31,7 @@ function renderIndustryIcon(iconName: string) {
 }
 
 export const IndustriesPage: React.FC = () => {
+  const { openConsultationModal } = useModal();
   const [industries, setIndustries] = useState<IndustryItem[]>([]);
 
   useEffect(() => {
@@ -115,12 +117,12 @@ export const IndustriesPage: React.FC = () => {
                   </div>
 
                   <div className="pt-6 mt-6 border-t border-gray200/50">
-                    <Link
-                      to="/contact"
-                      className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-amberAccent hover:text-amberAccentDark uppercase tracking-wider group-hover:translate-x-1 transition-transform"
+                    <button
+                      onClick={() => openConsultationModal(`${ind.title} Consultation`)}
+                      className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-amberAccent hover:text-amberAccentDark uppercase tracking-wider group-hover:translate-x-1 transition-transform cursor-pointer"
                     >
                       CONTACT FOR CONSULTATION <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
 
@@ -141,12 +143,12 @@ export const IndustriesPage: React.FC = () => {
                 Our thermal experts conduct on-site utility loss diagnosis and custom boiler automation engineering across India.
               </p>
             </div>
-            <Link
-              to="/contact"
-              className="px-6 py-3.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shadow-amberGlow shrink-0 flex items-center gap-2"
+            <button
+              onClick={() => openConsultationModal('Industry Specific Utility Audit')}
+              className="px-6 py-3.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shadow-amberGlow shrink-0 flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
             >
               REQUEST INDUSTRY CONSULTATION <PhoneCall className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
 
         </div>

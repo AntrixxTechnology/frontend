@@ -31,6 +31,7 @@ export const SolutionDetailPage: React.FC = () => {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedProductIndex, setSelectedProductIndex] = useState<number>(0);
+  const [windowStartIndex, setWindowStartIndex] = useState<number>(0);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -64,6 +65,7 @@ export const SolutionDetailPage: React.FC = () => {
       getSolutionBySlug(slug).then((data) => {
         setSolution(data);
         setSelectedProductIndex(0);
+        setWindowStartIndex(0);
         setLoading(false);
       });
     }
@@ -228,11 +230,31 @@ export const SolutionDetailPage: React.FC = () => {
   const currentProduct = subProducts[selectedProductIndex] || subProducts[0];
 
   const handlePrevProduct = () => {
-    setSelectedProductIndex((prev) => (prev > 0 ? prev - 1 : subProducts.length - 1));
+    setSelectedProductIndex((prev) => {
+      const nextIdx = prev > 0 ? prev - 1 : subProducts.length - 1;
+      if (subProducts.length > 3) {
+        if (nextIdx < windowStartIndex) {
+          setWindowStartIndex(nextIdx);
+        } else if (nextIdx === subProducts.length - 1) {
+          setWindowStartIndex(Math.max(0, subProducts.length - 3));
+        }
+      }
+      return nextIdx;
+    });
   };
 
   const handleNextProduct = () => {
-    setSelectedProductIndex((prev) => (prev < subProducts.length - 1 ? prev + 1 : 0));
+    setSelectedProductIndex((prev) => {
+      const nextIdx = prev < subProducts.length - 1 ? prev + 1 : 0;
+      if (subProducts.length > 3) {
+        if (nextIdx >= windowStartIndex + 3) {
+          setWindowStartIndex(Math.min(nextIdx - 2, subProducts.length - 3));
+        } else if (nextIdx === 0) {
+          setWindowStartIndex(0);
+        }
+      }
+      return nextIdx;
+    });
   };
 
   // Helper to render full description with automatic numbered/bullet points
@@ -513,16 +535,22 @@ export const SolutionDetailPage: React.FC = () => {
                 <ChevronLeft className="w-5 h-5" />
               </button>
 
-              {/* Desktop View: Grid of all models */}
-              <div className="flex-1">
-                <div className="hidden md:grid md:grid-cols-3 gap-5">
+              {/* Desktop View: 3-Card Sliding Window Slider (NEVER stacks vertically!) */}
+              <div className="flex-1 overflow-hidden">
+                <div 
+                  className="hidden md:flex transition-transform duration-500 ease-out gap-4"
+                  style={{
+                    transform: `translateX(calc(-${windowStartIndex} * ((100% - 2rem) / 3 + 1rem)))`
+                  }}
+                >
                   {subProducts.map((prod, idx) => {
                     const isSelected = idx === selectedProductIndex;
                     return (
                       <div
                         key={prod.id || idx}
                         onClick={() => setSelectedProductIndex(idx)}
-                        className={`rounded-2xl p-3.5 transition-all cursor-pointer bg-white text-center space-y-2.5 ${
+                        style={{ width: 'calc((100% - 2rem) / 3)' }}
+                        className={`shrink-0 rounded-2xl p-3.5 transition-all cursor-pointer bg-white text-center space-y-2.5 ${
                           isSelected
                             ? 'border-2 border-amberAccent shadow-md ring-2 ring-amberAccent/20'
                             : 'border border-gray-200 hover:border-gray-300 shadow-sm opacity-80 hover:opacity-100'
@@ -566,6 +594,25 @@ export const SolutionDetailPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* Desktop Pagination Dots if more than 3 models */}
+                {subProducts.length > 3 && (
+                  <div className="hidden md:flex justify-center items-center gap-2 pt-3">
+                    {Array.from({ length: subProducts.length - 2 }).map((_, dotIdx) => (
+                      <button
+                        key={dotIdx}
+                        onClick={() => {
+                          setWindowStartIndex(dotIdx);
+                          setSelectedProductIndex(dotIdx);
+                        }}
+                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                          windowStartIndex === dotIdx ? 'w-6 bg-amberAccent' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Slide to group ${dotIdx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button

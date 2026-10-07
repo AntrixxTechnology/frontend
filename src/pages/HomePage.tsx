@@ -14,8 +14,10 @@ import {
   getSiteSettings,
   SiteSettings
 } from '../api/client';
+import { useModal } from '../context/ModalContext';
 
 export const HomePage: React.FC = () => {
+  const { openConsultationModal } = useModal();
   const [hero, setHero] = useState<HeroContent | null>(() => {
     try {
       const cached = localStorage.getItem('antrixx_hero_cache');
@@ -254,12 +256,12 @@ export const HomePage: React.FC = () => {
             Contact us for expert turnkey solutions in thermal engineering, boiler automation, and utility management.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              to="/contact"
-              className="px-8 py-4 bg-amberAccent text-inkBlack font-bold uppercase text-sm tracking-wider rounded hover:bg-white transition-colors"
+            <button
+              onClick={() => openConsultationModal('Thermal & Process Solutions Consultation')}
+              className="px-8 py-4 bg-amberAccent text-inkBlack font-bold uppercase text-sm tracking-wider rounded hover:bg-white transition-colors cursor-pointer"
             >
               Contact Us
-            </Link>
+            </button>
             <a
               href={`tel:${settings?.phone_primary?.replace(/\s+/g, '') || '+919748636108'}`}
               className="px-8 py-4 border border-gray-600 text-white font-bold uppercase text-sm tracking-wider rounded hover:border-white transition-colors flex items-center justify-center gap-2"

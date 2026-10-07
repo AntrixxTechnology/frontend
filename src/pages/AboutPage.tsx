@@ -14,8 +14,10 @@ import {
   Factory,
 } from 'lucide-react';
 import { getAbout, getTeam, AboutContent, TeamMember, getImageUrl } from '../api/client';
+import { useModal } from '../context/ModalContext';
 
 export const AboutPage: React.FC = () => {
+  const { openConsultationModal } = useModal();
   const [about, setAbout] = useState<AboutContent | null>(null);
   const [team, setTeam] = useState<TeamMember[]>([]);
 
@@ -225,12 +227,12 @@ export const AboutPage: React.FC = () => {
                 Schedule a meeting with our thermal automation specialists for a comprehensive site survey.
               </p>
             </div>
-            <Link
-              to="/contact"
-              className="px-7 py-3.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shadow-amberGlow shrink-0 flex items-center gap-2"
+            <button
+              onClick={() => openConsultationModal('Engineering Team Consultation')}
+              className="px-7 py-3.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shadow-amberGlow shrink-0 flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
             >
               CONTACT ENGINEERING TEAM <PhoneCall className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </section>

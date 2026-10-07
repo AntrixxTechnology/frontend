@@ -11,8 +11,10 @@ import {
   Filter,
 } from 'lucide-react';
 import { getProjects, getClientLogos, ProjectItem, ClientLogoItem, getImageUrl } from '../api/client';
+import { useModal } from '../context/ModalContext';
 
 export const ProjectsPage: React.FC = () => {
+  const { openConsultationModal } = useModal();
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [clientLogos, setClientLogos] = useState<ClientLogoItem[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState<string>('All');
@@ -160,12 +162,12 @@ export const ProjectsPage: React.FC = () => {
                   </div>
 
                   <div className="pt-4 border-t border-gray200">
-                    <Link
-                      to="/contact"
-                      className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-amberAccent hover:text-amberAccentDark uppercase tracking-wider group-hover:translate-x-1 transition-transform"
+                    <button
+                      onClick={() => openConsultationModal(`${proj.title} Audit`)}
+                      className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-amberAccent hover:text-amberAccentDark uppercase tracking-wider group-hover:translate-x-1 transition-transform cursor-pointer"
                     >
                       REQUEST SIMILAR PROJECT AUDIT <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
 
@@ -236,12 +238,12 @@ export const ProjectsPage: React.FC = () => {
                 Our thermal and controls engineers are available for immediate on-site plant surveys and technical consultations.
               </p>
             </div>
-            <Link
-              to="/contact"
-              className="px-7 py-3.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shadow-amberGlow shrink-0 flex items-center gap-2"
+            <button
+              onClick={() => openConsultationModal('On-Site Plant Audit')}
+              className="px-7 py-3.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-white font-display font-bold text-xs uppercase tracking-wider shadow-amberGlow shrink-0 flex items-center gap-2 cursor-pointer transition-all hover:-translate-y-0.5"
             >
               SCHEDULE ON-SITE AUDIT <PhoneCall className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </section>
