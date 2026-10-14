@@ -231,11 +231,11 @@ export const getHero = async (): Promise<HeroContent> => {
 export const getSiteSettings = async (): Promise<SiteSettings> => {
   return fetchJson<SiteSettings>('/site-settings', {
     id: 'settings-1',
-    phone_primary: '+91 98310 00000',
-    phone_secondary: '+91 33 2200 0000',
-    email: 'info@antrixxtechnology.com',
-    address: 'Kolkata, West Bengal, India',
-    business_hours: 'Mon - Sat: 9:00 AM - 7:00 PM',
+    phone_primary: '+91 9748636108',
+    phone_secondary: '+91 9477179885',
+    email: 'antrixxtechnology@gmail.com',
+    address: 'BE 89, Street No 174, Action Area 1, Newtown, Kolkata, West Bengal 700156',
+    business_hours: 'Mon - Sat: 9:00 AM - 7:00 PM IST',
   });
 };
 

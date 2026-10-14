@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   MessageSquare,
+  ArrowRight,
 } from 'lucide-react';
 
 import { API_BASE } from '../api/client';
@@ -91,9 +92,17 @@ export const ContactPage: React.FC = () => {
                 Corporate HQ
               </h3>
               <p className="text-xs text-gray-600 leading-relaxed font-medium">
-                Antrixx Technology,<br />
-                Kolkata, West Bengal, India
+                BE 89, Street No 174, Action Area 1,<br />
+                Newtown, Kolkata, West Bengal 700156
               </p>
+              <a
+                href="https://maps.app.goo.gl/Urp4Xd9Qu2HnzJgL9"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-amberAccent hover:underline pt-1"
+              >
+                OPEN ON GOOGLE MAPS <ArrowRight className="w-3 h-3" />
+              </a>
             </div>
 
             {/* Card 2: Direct Phone */}
@@ -311,23 +320,32 @@ export const ContactPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Styled Map Placeholder Box */}
-              <div className="rounded-2xl overflow-hidden border border-gray200 shadow-sm relative h-64 bg-gray-100 flex items-center justify-center text-center p-6">
+              {/* Styled Interactive Google Map Link Box */}
+              <a
+                href="https://maps.app.goo.gl/Urp4Xd9Qu2HnzJgL9"
+                target="_blank"
+                rel="noreferrer"
+                className="group rounded-2xl overflow-hidden border border-gray-200 shadow-sm relative h-64 bg-gray-900 flex items-center justify-center text-center p-6 cursor-pointer block"
+                title="Click to view Antrixx Technology on Google Maps"
+              >
                 <img
                   src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop"
                   alt="Kolkata HQ Location Map"
-                  className="w-full h-full object-cover opacity-60"
+                  className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-inkBlack/40 backdrop-blur-[2px] flex flex-col items-center justify-center text-white p-4 space-y-2">
-                  <MapPin className="w-8 h-8 text-amberAccent animate-bounce" />
+                <div className="absolute inset-0 bg-inkBlack/50 group-hover:bg-inkBlack/40 transition-colors backdrop-blur-[2px] flex flex-col items-center justify-center text-white p-4 space-y-2">
+                  <MapPin className="w-8 h-8 text-amberAccent group-hover:animate-bounce" />
                   <h4 className="font-display font-extrabold text-sm text-white">
                     Antrixx Technology Head Office
                   </h4>
-                  <p className="text-[11px] text-slate-200">
-                    Kolkata, West Bengal, India
+                  <p className="text-[11px] text-slate-200 max-w-xs leading-relaxed">
+                    BE 89, STREET NO 174, ACTION AREA 1, NEWTOWN, KOLKATA, WEST BENGAL 700156
                   </p>
+                  <span className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amberAccent text-white font-bold text-[11px] uppercase tracking-wider shadow-amberGlow group-hover:scale-105 transition-transform">
+                    VIEW ON GOOGLE MAPS <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
                 </div>
-              </div>
+              </a>
 
             </div>
 

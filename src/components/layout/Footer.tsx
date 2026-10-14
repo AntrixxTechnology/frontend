@@ -116,19 +116,44 @@ export const Footer: React.FC = () => {
                 <Mail className="w-4 h-4 text-amberAccent shrink-0 mt-0.5" />
                 <span>antrixxtechnology@gmail.com</span>
               </a>
-              <div className="flex items-start gap-2">
+              <a
+                href="https://maps.app.goo.gl/Urp4Xd9Qu2HnzJgL9"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-start gap-2 hover:text-amberAccent transition-colors"
+                title="View on Google Maps"
+              >
                 <MapPin className="w-4 h-4 text-amberAccent shrink-0 mt-0.5" />
-                <span>Kolkata, West Bengal, India</span>
-              </div>
+                <span className="leading-relaxed">
+                  {settings?.address || 'BE 89, Street No 174, Action Area 1, Newtown, Kolkata, West Bengal 700156'}
+                </span>
+              </a>
             </div>
 
+            {/* Embedded Google Map Box */}
             <div className="pt-2">
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-1 text-xs font-bold text-amberAccent hover:underline"
+              <a
+                href="https://maps.app.goo.gl/Urp4Xd9Qu2HnzJgL9"
+                target="_blank"
+                rel="noreferrer"
+                className="block group relative w-full h-24 rounded-xl overflow-hidden border border-slate-700 hover:border-amberAccent transition-all shadow-md bg-slate-900"
+                title="Click to view Antrixx Technology on Google Maps"
               >
-                VIEW LOCATION MAP <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+                <iframe
+                  title="Antrixx Technology Location Map"
+                  src="https://maps.google.com/maps?q=BE+89,+Street+No+174,+Action+Area+1,+Newtown,+Kolkata,+West+Bengal+700156&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                  className="w-full h-full border-0 pointer-events-none opacity-70 group-hover:opacity-90 transition-opacity"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2 justify-between pointer-events-none">
+                  <span className="text-[10px] font-bold text-amberAccent flex items-center gap-1 drop-shadow">
+                    <MapPin className="w-3 h-3 text-amberAccent" /> Newtown, Kolkata
+                  </span>
+                  <span className="text-[9px] font-bold text-inkBlack bg-amberAccent px-1.5 py-0.5 rounded shadow group-hover:scale-105 transition-transform">
+                    Open Map ↗
+                  </span>
+                </div>
+              </a>
             </div>
           </div>
 

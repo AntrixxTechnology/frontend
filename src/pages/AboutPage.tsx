@@ -43,9 +43,12 @@ export const AboutPage: React.FC = () => {
             <span>/</span>
             <span className="text-amberAccent">ABOUT US</span>
           </div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amberAccent/15 border border-amberAccent/30 text-[11px] font-bold text-amberAccent uppercase tracking-widest mb-4">
+            Reliable Systems &bull; Efficient Operations &bull; A Greener Future
+          </div>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto">
-            Engineering Excellence.<br />
-            <span className="text-amberAccent">Delivering Impact.</span>
+            Boiler & Steam Systems.<br />
+            <span className="text-amberAccent">Engineering Excellence.</span>
           </h1>
         </div>
       </section>
@@ -56,15 +59,15 @@ export const AboutPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             <div className="lg:col-span-6 space-y-6">
-              <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block">
-                OUR STORY & EXPERTISE
+              <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block font-display">
+                OUR STORY & BOILER EXPERTISE
               </span>
               <h2 className="font-display text-3xl font-extrabold text-inkBlack leading-tight">
-                Pioneering Utility Automation Across India Since 2015
+                Pioneering Boiler Engineering & Utility Automation Across India
               </h2>
               <p className="text-sm text-gray-600 leading-relaxed font-normal">
                 {about?.company_story ||
-                  'Antrixx Technology was established by veteran thermal and utility automation engineers dedicated to optimizing industrial energy efficiency across India. Operating extensively across process industries—including food processing, FMCG, rice & agro processing, textiles, beverages, and chemicals—our team specializes in the sales, engineering, installation, and balance-of-plant service for boilers, thermic fluid heaters, hot water generators, steam automation, and industrial water treatment facilities.'}
+                  'Antrixx Technology is a Kolkata-headquartered industrial engineering and turnkey automation firm led by veteran thermal engineers. We specialize in the complete lifecycle of Boiler & Steam Systems—from custom thermal design, heavy metallurgy fabrication, and site erection to Indian Boiler Regulations (IBR) compliance and preventive Annual Maintenance Contracts (AMC). Partnering with process manufacturers across FMCG, food processing, rice mills, textiles, pharmaceuticals, and chemical manufacturing, Antrixx delivers end-to-end utility infrastructure. Beyond high-efficiency boiler houses, our multidisciplinary engineering team integrates high-capacity Chillers & Heat Pumps, specialized Air Pollution Control Equipment (ESP, Wet Scrubbers, Bag Filters), and precision PLC/SCADA Automation to eliminate fuel waste, reduce carbon emissions, and ensure 24/7 zero-unplanned-downtime operations.'}
               </p>
 
               <div className="grid grid-cols-2 gap-4 pt-2">
@@ -107,7 +110,7 @@ export const AboutPage: React.FC = () => {
               <h3 className="font-display text-2xl font-extrabold text-inkBlack">Our Mission</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {about?.mission ||
-                  'To transform industrial thermal and utility house management by delivering smart automation, precision instrumentation, and turnkey engineering solutions that minimize fuel waste, maximize efficiency, and ensure environmental compliance.'}
+                  'To empower process industries nationwide with robust boiler systems, emission control engineering, and intelligent automation that optimize fuel economics and drive sustainable industrial growth.'}
               </p>
             </div>
 
@@ -119,7 +122,7 @@ export const AboutPage: React.FC = () => {
               <h3 className="font-display text-2xl font-extrabold text-inkBlack">Our Vision</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {about?.vision ||
-                  'To be South Asia’s most trusted engineering partner for boiler house optimization, energy loss diagnostics, and sustainable industrial utilities.'}
+                  "To be India's premier engineering destination for turnkey steam engineering, industrial utility optimization, and sustainable thermal infrastructure."}
               </p>
             </div>
 
@@ -149,23 +152,34 @@ export const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. Core Capabilities Checklist (9 Verticals) */}
+      {/* 4. Core Capabilities Checklist (The 7 Pillars from Official Card) */}
       <section className="py-20 bg-white">
         <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block">
-              FULL-SPECTRUM CAPABILITIES
+            <span className="text-amberAccent text-xs font-bold uppercase tracking-widest block font-display">
+              OUR 7 CORE ENGINEERING SERVICES
             </span>
             <h2 className="font-display text-3xl font-extrabold text-inkBlack">
-              End-to-End Thermal & Utility Engineering Scope
+              Complete Industrial Utility & Thermal Infrastructure
             </h2>
+            <p className="text-xs text-gray-500 max-w-xl mx-auto">
+              Integrated engineering capabilities designed for maximum operational efficiency, IBR regulatory compliance, and fuel savings.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(about?.capabilities || []).map((cap, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-offWhite border border-gray200 flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-amberAccent shrink-0" />
-                <span className="text-xs font-bold text-inkBlack">{cap}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {(about?.capabilities && about.capabilities.length > 0 ? about.capabilities : [
+              "Boiler & Steam Systems (Design | Fabrication | Installation | AMC)",
+              "Pollution Control Engineering (Cyclone | Bag Filter | Wet Scrubber | ESP)",
+              "Chiller & Heat Pumps (HVAC | Process Cooling | Energy Saving)",
+              "Engineering Solutions (Consulting | Design | Execution)",
+              "Energy Optimization (Efficiency | Cost Saving | Sustainability)",
+              "Other Industrial Services (Retrofit | Upgradation | AMC)",
+              "Industrial Automation (PLC & SCADA | Integration | Support)"
+            ]).map((cap, idx) => (
+              <div key={idx} className="p-5 rounded-2xl bg-offWhite border border-gray200 flex items-start gap-3.5 hover:border-amberAccent hover:shadow-cardLight transition-all">
+                <CheckCircle2 className="w-5 h-5 text-amberAccent shrink-0 mt-0.5" />
+                <span className="text-xs font-bold text-inkBlack leading-relaxed">{cap}</span>
               </div>
             ))}
           </div>
@@ -188,12 +202,27 @@ export const AboutPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {team.map((member) => (
                 <div key={member.id} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4 group">
-                  <div className="h-64 w-full rounded-xl overflow-hidden bg-offWhite relative">
-                    <img 
-                      src={getImageUrl(member.image_url) || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop"} 
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                  <div className="h-56 w-full rounded-xl overflow-hidden bg-gradient-to-br from-[#0F141C] via-[#141B26] to-[#0A0E14] relative flex flex-col items-center justify-center p-6 border border-slate-800">
+                    {member.image_url && !member.image_url.includes('unsplash') ? (
+                      <img 
+                        src={getImageUrl(member.image_url)} 
+                        alt={member.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center space-y-3">
+                        <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
+                          <img 
+                            src="/logo-white.png" 
+                            alt="Antrixx Logo" 
+                            className="h-10 w-auto object-contain"
+                          />
+                        </div>
+                        <span className="text-[10px] font-bold tracking-widest uppercase text-amberAccent">
+                          EXECUTIVE LEADERSHIP
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 className="font-display font-extrabold text-base text-inkBlack">{member.name}</h3>

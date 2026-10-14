@@ -37,19 +37,19 @@ export const Navbar: React.FC = () => {
         isScrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-md' : 'bg-white py-4 border-b border-gray200'
       }`}
     >
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center group">
-            <img src="/logo.png" alt="Antrixx Logo" className="h-9 sm:h-10 w-auto object-contain" />
+          <Link to="/" className="flex items-center group shrink-0 mr-4 xl:mr-8 py-0.5">
+            <img src="/logo.png" alt="Antrixx Logo" className="h-8 sm:h-9 w-auto object-contain" />
           </Link>
 
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-8 font-sans">
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-6 font-sans">
             <Link
               to="/"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname === '/' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -64,7 +64,7 @@ export const Navbar: React.FC = () => {
             >
               <Link
                 to="/solutions"
-                className={`text-[12px] font-bold tracking-[0.1em] uppercase flex items-center gap-1.5 transition-colors py-2 ${
+                className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase flex items-center gap-1 transition-colors py-2 whitespace-nowrap shrink-0 ${
                   location.pathname.startsWith('/solutions')
                     ? 'text-amberAccent'
                     : 'text-inkBlack hover:text-amberAccent'
@@ -153,7 +153,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/industries"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname === '/industries' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -162,7 +162,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/projects"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname === '/projects' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -171,7 +171,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/about"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname === '/about' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -180,7 +180,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/resources"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname.startsWith('/resources') ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -189,7 +189,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/careers"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname === '/careers' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -198,7 +198,7 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/contact"
-              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+              className={`text-[11px] xl:text-[12px] font-bold tracking-[0.05em] xl:tracking-[0.08em] uppercase transition-colors whitespace-nowrap shrink-0 ${
                 location.pathname === '/contact' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
               }`}
             >
@@ -208,20 +208,20 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right Phone + CTA */}
-          <div className="hidden xl:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3 xl:gap-4 shrink-0 ml-3 xl:ml-6">
             <a
               href="tel:+919748636108"
-              className="flex items-center gap-2 text-xs font-bold text-inkBlack hover:text-amberAccent transition-colors border-r border-gray200 pr-4"
+              className="hidden 2xl:flex items-center gap-1.5 text-xs font-bold text-inkBlack hover:text-amberAccent transition-colors border-r border-gray200 pr-3 whitespace-nowrap shrink-0"
             >
               <Phone className="w-3.5 h-3.5 text-amberAccent" />
-              +91 9748636108
+              <span>+91 9748636108</span>
             </a>
 
             <button
               onClick={() => openConsultationModal('General Engineering Consultation')}
-              className="px-5 py-2.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-inkBlack text-xs font-display font-extrabold hover:-translate-y-0.5 transition-all flex items-center gap-1.5 uppercase shadow-amberGlow cursor-pointer"
+              className="px-3.5 xl:px-5 py-2.5 rounded-md bg-amberAccent hover:bg-amberAccentDark text-inkBlack text-[11px] xl:text-xs font-display font-extrabold hover:-translate-y-0.5 transition-all flex items-center gap-1.5 uppercase shadow-amberGlow cursor-pointer whitespace-nowrap shrink-0"
             >
-              ENQUIRE NOW <ArrowRight className="w-3.5 h-3.5" />
+              <span>ENQUIRE NOW</span> <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 

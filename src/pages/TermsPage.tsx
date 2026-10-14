@@ -112,7 +112,7 @@ export const TermsPage: React.FC = () => {
             <div className="space-y-2 text-xs sm:text-sm text-gray-300">
               <p className="flex items-center gap-2"><Mail className="w-4 h-4 text-amberAccent" /> <strong>Email:</strong> help@antrixxtechnology.net / info@antrixxtechnology.net</p>
               <p className="flex items-center gap-2"><Phone className="w-4 h-4 text-amberAccent" /> <strong>Phone:</strong> +91 9748636108</p>
-              <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amberAccent" /> <strong>Office:</strong> Kolkata, West Bengal, India</p>
+              <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-amberAccent" /> <strong>Office:</strong> BE 89, Street No 174, Action Area 1, Newtown, Kolkata, West Bengal 700156</p>
             </div>
           </div>
         </section>

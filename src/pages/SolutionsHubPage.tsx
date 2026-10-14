@@ -359,11 +359,17 @@ export const SolutionsHubPage: React.FC = () => {
                 </a>
               </div>
 
-              <div className="p-4 rounded-xl bg-white border border-[#E6EAEE] shadow-sm space-y-1">
+              <a
+                href="https://maps.app.goo.gl/Urp4Xd9Qu2HnzJgL9"
+                target="_blank"
+                rel="noreferrer"
+                className="p-4 rounded-xl bg-white border border-[#E6EAEE] shadow-sm space-y-1 block hover:border-amberAccent transition-colors"
+                title="View on Google Maps"
+              >
                 <MapPin className="w-4 h-4 text-[#C98208]" />
                 <b className="block text-xs text-[#111923]">Registered Office</b>
-                <p className="text-[11px] text-[#647180]">Kolkata, West Bengal, India</p>
-              </div>
+                <p className="text-[11px] text-[#647180] leading-snug">BE 89, Action Area 1, Newtown, Kolkata 700156</p>
+              </a>
 
               <div className="p-4 rounded-xl bg-white border border-[#E6EAEE] shadow-sm space-y-1">
                 <Clock className="w-4 h-4 text-[#C98208]" />
