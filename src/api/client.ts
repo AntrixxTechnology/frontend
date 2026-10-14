@@ -185,17 +185,40 @@ const isLocal = typeof window !== 'undefined' &&
 
 export const API_BASE = isLocal 
   ? 'http://localhost:5000/api' 
-  : (import.meta.env.VITE_API_URL || 'https://antrixx-backend.vercel.app/api');
+  : (import.meta.env.VITE_API_URL || 'https://api.antrixxtechnology.net/api');
+
+export const HOST_BASE = isLocal 
+  ? 'http://localhost:5000' 
+  : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api(\/admin)?$/, '') : 'https://api.antrixxtechnology.net');
 
 export const getImageUrl = (path?: string) => {
   if (!path) return '';
-  if (path.startsWith('http')) return path;
-  if (path.startsWith('/uploads')) {
-    const baseUrl = isLocal 
-      ? 'http://localhost:5000' 
-      : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api(\/admin)?$/, '') : 'https://antrixx-backend.vercel.app');
-    return `${baseUrl}${path}`;
+
+  // Intercept any Supabase Storage Public URLs to completely hide origin
+  const supabaseRegex = /https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/i;
+  const match = path.match(supabaseRegex);
+  if (match) {
+    const bucket = match[1];
+    const fileName = match[2];
+    return `${HOST_BASE}/api/media/${bucket}/${fileName}`;
   }
+
+  // Intercept internal media proxy paths
+  if (path.startsWith('/api/media/') || path.startsWith('/media/')) {
+    const cleanPath = path.startsWith('/api/') ? path : `/api${path}`;
+    return `${HOST_BASE}${cleanPath}`;
+  }
+
+  // Intercept legacy local uploads
+  if (path.startsWith('/uploads')) {
+    return `${HOST_BASE}${path}`;
+  }
+
+  // External public links (Unsplash, CDNs)
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+
   return path;
 };
 
