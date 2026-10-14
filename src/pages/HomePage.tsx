@@ -16,25 +16,65 @@ import {
 } from '../api/client';
 import { useModal } from '../context/ModalContext';
 
+const DEFAULT_HERO: HeroContent = {
+  id: 'hero-1',
+  badge: 'INDUSTRIAL AUTOMATION & ENERGY SOLUTIONS',
+  headline: 'Engineering Intelligence.',
+  accent_text: 'Powering Industries.',
+  description: 'Antrixx Technology delivers high-efficiency boiler house automation, utility remote monitoring, pollution control systems, and balance-of-plant management tailored for enterprise manufacturing.',
+  primary_cta_text: 'EXPLORE SOLUTIONS',
+  primary_cta_link: '/solutions',
+  secondary_cta_text: 'DOWNLOAD BROCHURE',
+  secondary_cta_link: '/resources/downloads',
+  hero_image_1: '/api/media/general/85609ab9-a6ea-477c-bdd4-05cb8c420f9c.jpeg',
+  hero_image_2: '/api/media/general/3c36a63e-6512-4574-9e95-77be7514e89a.jpeg',
+  hero_image_3: '/api/media/general/58bcff11-3bd1-4e0c-8fe5-2f440c17b85e.jpeg',
+  card_2_title: 'SCADA Telemetry',
+  card_2_link: '/solutions/utility-remote-monitoring',
+  card_3_title: 'Environment Control',
+  card_3_link: '/solutions/pollution-control-equipment',
+  scada_plant_efficiency: 94,
+  scada_steam_flow: 12.45,
+  scada_fuel_consumption: 850,
+  scada_energy_saved_mwh: 1240,
+  is_published: true,
+};
+
 export const HomePage: React.FC = () => {
   const { openConsultationModal } = useModal();
-  const [hero, setHero] = useState<HeroContent | null>(null);
+  const [hero, setHero] = useState<HeroContent>(() => {
+    try {
+      const cached = localStorage.getItem('antrixx_hero_state');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return DEFAULT_HERO;
+  });
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [stats, setStats] = useState<StatItem[]>([]);
-  const [solutions, setSolutions] = useState<SolutionItem[]>([]);
+  const [solutions, setSolutions] = useState<SolutionItem[]>(() => {
+    try {
+      const cached = localStorage.getItem('antrixx_solutions_state');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return [];
+  });
   const [clientLogos, setClientLogos] = useState<ClientLogoItem[]>([]);
 
   useEffect(() => {
-    // Clear any obsolete localStorage items
-    try {
-      localStorage.removeItem('antrixx_hero_cache');
-      localStorage.removeItem('antrixx_settings_cache');
-    } catch {}
-
-    getHero().then((data) => data && setHero(data));
+    getHero().then((data) => {
+      if (data) {
+        setHero(data);
+        try { localStorage.setItem('antrixx_hero_state', JSON.stringify(data)); } catch {}
+      }
+    });
     getSiteSettings().then((data) => data && setSettings(data));
     getStats().then(setStats);
-    getSolutions().then(setSolutions);
+    getSolutions().then((data) => {
+      if (data && data.length > 0) {
+        setSolutions(data);
+        try { localStorage.setItem('antrixx_solutions_state', JSON.stringify(data)); } catch {}
+      }
+    });
     getClientLogos().then(setClientLogos);
   }, []);
 
@@ -53,7 +93,7 @@ export const HomePage: React.FC = () => {
             {/* Left Main Banner */}
             <div className="relative rounded-2xl overflow-hidden banner-zoom-container group h-[400px] lg:h-full">
               <img 
-                src={getImageUrl(hero?.hero_image_1) || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop"} 
+                src={getImageUrl(hero.hero_image_1) || getImageUrl('/api/media/general/85609ab9-a6ea-477c-bdd4-05cb8c420f9c.jpeg')} 
                 alt="Industrial Plant" 
                 className="absolute inset-0 w-full h-full object-cover" 
               />
@@ -61,10 +101,10 @@ export const HomePage: React.FC = () => {
               
               <div className="absolute inset-0 p-10 flex flex-col justify-end lg:justify-center z-10">
                 <span className="text-amberAccent font-bold tracking-widest uppercase text-xs mb-3 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                  {hero?.badge || "Industrial Automation"}
+                  {hero.badge || "Industrial Automation"}
                 </span>
                 <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                  {hero?.headline || "Engineering Intelligence."}
+                  {hero.headline || "Engineering Intelligence."}
                 </h1>
                 <Link to="/solutions" className="inline-flex items-center gap-2 text-white font-bold uppercase text-sm border-b-2 border-amberAccent pb-1 w-fit hover:text-amberAccent transition-colors animate-fade-in-up" style={{animationDelay: '0.3s'}}>
                   Explore Solutions <ArrowRight className="w-4 h-4" />
@@ -78,7 +118,7 @@ export const HomePage: React.FC = () => {
               {/* Top Right Banner */}
               <div className="relative rounded-2xl overflow-hidden banner-zoom-container group h-[300px] lg:h-full">
                 <img 
-                  src={getImageUrl(hero?.hero_image_2) || "https://images.unsplash.com/photo-1580982327559-c1202864eb05?q=80&w=800&auto=format&fit=crop"} 
+                  src={getImageUrl(hero.hero_image_2) || getImageUrl('/api/media/general/3c36a63e-6512-4574-9e95-77be7514e89a.jpeg')} 
                   alt="Telemetry" 
                   className="absolute inset-0 w-full h-full object-cover" 
                 />
@@ -86,9 +126,9 @@ export const HomePage: React.FC = () => {
                 
                 <div className="absolute inset-0 p-8 flex flex-col justify-end z-10 text-center items-center">
                   <h2 className="font-display text-3xl font-extrabold text-white mb-4">
-                    {hero?.card_2_title || "SCADA Telemetry"}
+                    {hero.card_2_title || "SCADA Telemetry"}
                   </h2>
-                  <Link to={hero?.card_2_link || "/solutions/utility-remote-monitoring"} className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
+                  <Link to={hero.card_2_link || "/solutions/utility-remote-monitoring"} className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
                     Shop System <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -97,7 +137,7 @@ export const HomePage: React.FC = () => {
               {/* Bottom Right Banner */}
               <div className="relative rounded-2xl overflow-hidden banner-zoom-container group h-[300px] lg:h-full">
                 <img 
-                  src={getImageUrl(hero?.hero_image_3) || "https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?q=80&w=800&auto=format&fit=crop"} 
+                  src={getImageUrl(hero.hero_image_3) || getImageUrl('/api/media/general/58bcff11-3bd1-4e0c-8fe5-2f440c17b85e.jpeg')} 
                   alt="Pollution Control" 
                   className="absolute inset-0 w-full h-full object-cover" 
                 />
@@ -105,9 +145,9 @@ export const HomePage: React.FC = () => {
                 
                 <div className="absolute inset-0 p-8 flex flex-col justify-end z-10 text-center items-center">
                   <h2 className="font-display text-3xl font-extrabold text-white mb-4">
-                    {hero?.card_3_title || "Environment Control"}
+                    {hero.card_3_title || "Environment Control"}
                   </h2>
-                  <Link to={hero?.card_3_link || "/solutions/pollution-control-equipment"} className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
+                  <Link to={hero.card_3_link || "/solutions/pollution-control-equipment"} className="inline-flex items-center gap-2 text-white font-bold uppercase text-xs border-b-2 border-white pb-1 w-fit hover:text-amberAccent hover:border-amberAccent transition-colors">
                     Explore Solutions <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
