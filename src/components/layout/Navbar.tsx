@@ -188,6 +188,15 @@ export const Navbar: React.FC = () => {
             </Link>
 
             <Link
+              to="/careers"
+              className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
+                location.pathname === '/careers' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
+              }`}
+            >
+              CAREERS
+            </Link>
+
+            <Link
               to="/contact"
               className={`text-[12px] font-bold tracking-[0.1em] uppercase transition-colors ${
                 location.pathname === '/contact' ? 'text-amberAccent' : 'text-inkBlack hover:text-amberAccent'
@@ -242,6 +251,7 @@ export const Navbar: React.FC = () => {
             <Link to="/projects" className="block text-sm font-bold text-inkBlack hover:text-amberAccent">PROJECTS</Link>
             <Link to="/about" className="block text-sm font-bold text-inkBlack hover:text-amberAccent">ABOUT US</Link>
             <Link to="/resources" className="block text-sm font-bold text-inkBlack hover:text-amberAccent">RESOURCES</Link>
+            <Link to="/careers" className="block text-sm font-bold text-inkBlack hover:text-amberAccent">CAREERS</Link>
             <Link to="/contact" className="block text-sm font-bold text-inkBlack hover:text-amberAccent">CONTACT US</Link>
           </nav>
 

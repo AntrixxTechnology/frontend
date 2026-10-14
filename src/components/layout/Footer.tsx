@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, ArrowRight, Linkedin, Globe, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, MapPin, ArrowRight, Linkedin, Facebook, Instagram, ShieldCheck } from 'lucide-react';
+import { getSiteSettings, SiteSettings } from '../../api/client';
 
 export const Footer: React.FC = () => {
+  const [settings, setSettings] = useState<SiteSettings | null>(() => {
+    try {
+      const cached = localStorage.getItem('antrixx_settings_state');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return null;
+  });
+
+  useEffect(() => {
+    getSiteSettings().then((data) => {
+      if (data) {
+        setSettings(data);
+        try { localStorage.setItem('antrixx_settings_state', JSON.stringify(data)); } catch {}
+      }
+    });
+  }, []);
+
   return (
     <footer className="bg-[#14141A] text-white pt-12 pb-8 border-t border-slate-800 font-sans">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,31 +31,44 @@ export const Footer: React.FC = () => {
           {/* Col 1: Brand & Bio */}
           <div className="space-y-4 lg:col-span-1">
             <div className="flex items-center">
-              <img src="/logo.png" alt="Antrixx Logo" className="h-12 w-auto bg-white p-2 rounded" />
+              <img src="/logo-white.png" alt="Antrixx Logo" className="h-10 w-auto object-contain" />
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
               Delivering intelligent & sustainable engineering solutions that drive efficiency, safety, and operational growth for process industries nationwide.
             </p>
 
+            {/* Social Links Controlled by Admin */}
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://linkedin.com"
-                target="_blank"
+                href={settings?.linkedin_url || '#'}
+                target={settings?.linkedin_url ? '_blank' : undefined}
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-amberAccent hover:border-amberAccent transition-colors"
+                className="w-9 h-9 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-amberAccent hover:border-amberAccent transition-all hover:scale-105"
                 aria-label="LinkedIn"
+                title={settings?.linkedin_url ? "Follow Antrixx on LinkedIn" : "LinkedIn"}
               >
                 <Linkedin className="w-4 h-4" />
               </a>
               <a
-                href="https://antrixx.in"
-                target="_blank"
+                href={settings?.facebook_url || '#'}
+                target={settings?.facebook_url ? '_blank' : undefined}
                 rel="noreferrer"
-                className="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-amberAccent hover:border-amberAccent transition-colors"
-                aria-label="Website"
+                className="w-9 h-9 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-amberAccent hover:border-amberAccent transition-all hover:scale-105"
+                aria-label="Facebook"
+                title={settings?.facebook_url ? "Follow Antrixx on Facebook" : "Facebook"}
               >
-                <Globe className="w-4 h-4" />
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href={settings?.instagram_url || '#'}
+                target={settings?.instagram_url ? '_blank' : undefined}
+                rel="noreferrer"
+                className="w-9 h-9 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-amberAccent hover:border-amberAccent transition-all hover:scale-105"
+                aria-label="Instagram"
+                title={settings?.instagram_url ? "Follow Antrixx on Instagram" : "Instagram"}
+              >
+                <Instagram className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -107,8 +138,8 @@ export const Footer: React.FC = () => {
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} ANTRIXX Industrial Engineering Solutions. All Rights Reserved.</p>
           <div className="flex items-center gap-6">
-            <Link to="/resources" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
-            <Link to="/resources" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
+            <Link to="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
             <Link to="/faq" className="hover:text-slate-300 transition-colors">FAQ</Link>
           </div>
         </div>
